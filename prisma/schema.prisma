@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventSource {
+  PARIS_OPENDATA
+  OPENAGENDA
+  USER_SUBMITTED
+}
+
+enum EventStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ActivityType {
+  SAVE_EVENT
+  UNSAVE_EVENT
+  REGISTER_EVENT
+  UNREGISTER_EVENT
+  FOLLOW_USER
+  UNFOLLOW_USER
+  SUBMIT_EVENT
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String?
+  bio           String?
+  role          String   @default("user")
+  certified     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  submittedEvents   Event[]            @relation("SubmittedBy")
+  savedEvents       SavedEvent[]
+  savedVenues       SavedVenue[]
+  registrations     EventRegistration[]
+  activityLogs      ActivityLog[]
+  followers         UserFollow[]       @relation("Following")
+  following         UserFollow[]       @relation("Follower")
+}
+
+model Venue {
+  id          String   @id @default(cuid())
+  name        String
+  address     String?
+  lat         Float?
+  lon         Float?
+  description String?
+  website     String?
+  createdAt   DateTime @default(now())
+
+  events      Event[]
+  savedBy     SavedVenue[]
+}
+
+model Event {
+  id             String      @id @default(cuid())
+  externalId     String?     @unique
+  title          String
+  description    String?
+  leadText       String?
+  dateStart      DateTime?
+  dateEnd        DateTime?
+  addressName    String?
+  addressStreet  String?
+  lat            Float?
+  lon            Float?
+  coverUrl       String?
+  coverAlt       String?
+  priceType      String?
+  priceDetail    String?
+  tags           String[]
+  qfapTags       String[]
+  source         EventSource @default(PARIS_OPENDATA)
+  status         EventStatus @default(APPROVED)
+  isFixedVenue   Boolean     @default(false)
+  adminCurated   Boolean     @default(false)
+  adminRejected  Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  venue          Venue?      @relation(fields: [venueId], references: [id])
+  venueId        String?
+  submittedBy    User?       @relation("SubmittedBy", fields: [submittedById], references: [id])
+  submittedById  String?
+
+  savedBy        SavedEvent[]
+  registrations  EventRegistration[]
+  curation       EventCuration?
+}
+
+model EventCuration {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  decision  String   // "approved" | "rejected" | "skipped"
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model SavedEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  externalId String?
+  eventId    String?
+  savedAt    DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event      Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, externalId])
+  @@unique([userId, eventId])
+}
+
+model SavedVenue {
+  id      String   @id @default(cuid())
+  userId  String
+  venueId String
+  savedAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue   Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, venueId])
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  userId       String
+  externalId   String?
+  eventId      String?
+  registeredAt DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, externalId])
+  @@unique([userId, eventId])
+}
+
+model UserFollow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model ActivityLog {
+  id           String       @id @default(cuid())
+  userId       String
+  type         ActivityType
+  targetId     String?
+  targetTitle  String?
+  targetCover  String?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
