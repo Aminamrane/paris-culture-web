@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Fallback admin account (works without DB)
         if (
           credentials.email === "admin@lumina.fr" &&
-          credentials.password === "Lumina2025!"
+          credentials.password === "Lumina2026!"
         ) {
           return { id: "admin-1", email: "admin@lumina.fr", name: "Admin", role: "admin", certified: true };
         }
