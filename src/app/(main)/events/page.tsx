@@ -84,7 +84,19 @@ export default function EventsPage() {
   const [locError, setLocError] = useState(false);
 
   useEffect(() => {
-    fetch("/api/events?limit=100").then(r => r.json()).then(d => setAll(d.events || [])).catch(() => {}).finally(() => setLoading(false));
+    fetch("/api/events?limit=100")
+      .then(r => r.json())
+      .then(d => {
+        const events: ParisEvent[] = d.events || [];
+        // Filter to admin-approved events only
+        try {
+          const curation: { externalId: string; decision: string }[] = JSON.parse(localStorage.getItem("lumina_curation") || "[]");
+          const approved = new Set(curation.filter(r => r.decision === "approved").map(r => r.externalId));
+          setAll(approved.size > 0 ? events.filter(e => approved.has(e.id)) : []);
+        } catch { setAll([]); }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const requestLoc = useCallback(() => {

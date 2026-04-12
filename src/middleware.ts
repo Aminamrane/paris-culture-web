@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
-  const isAdmin = req.auth?.user?.role === "ADMIN";
+  const isAdmin = req.auth?.user?.role === "admin";
 
   // Admin routes — must be logged in AND admin
   if (pathname.startsWith("/admin")) {

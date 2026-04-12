@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET || "lumina-secret-key-fallback-2025",
   providers: [
     Credentials({
       credentials: {
