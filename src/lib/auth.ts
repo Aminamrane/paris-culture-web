@@ -11,6 +11,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Fallback admin account (works without DB)
+        if (
+          credentials.email === "admin@lumina.fr" &&
+          credentials.password === "Lumina2025!"
+        ) {
+          return { id: "admin-1", email: "admin@lumina.fr", name: "Admin", role: "admin", certified: true };
+        }
+
         try {
           const { prisma } = await import("./prisma");
           const bcrypt = await import("bcryptjs");
