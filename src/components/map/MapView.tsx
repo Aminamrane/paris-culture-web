@@ -81,16 +81,28 @@ export default function MapView({ initialEvents }: Props) {
 
       await new Promise<void>(r => map.on("load", r));
 
-      // Use server-provided events, or fetch from browser if empty
+      // Fetch all events
       let evts = initialEvents;
       if (!evts || evts.length === 0) {
-        console.log("No server events, fetching from browser...");
-        setStatus("Fetching events...");
+        setStatus("Chargement des événements…");
         evts = await fetchEventsFromBrowser();
-        setEvents(evts);
       }
 
-      console.log("Adding", evts.length, "events to map");
+      // Filter to only admin-approved events
+      let approved: Set<string>;
+      try {
+        const curation: { externalId: string; decision: string }[] = JSON.parse(localStorage.getItem("lumina_curation") || "[]");
+        approved = new Set(curation.filter(r => r.decision === "approved").map(r => r.externalId));
+      } catch { approved = new Set(); }
+
+      const filtered = approved.size > 0 ? evts.filter(e => approved.has(e.id)) : [];
+      setEvents(filtered);
+
+      if (filtered.length === 0) {
+        setStatus("no-approved");
+        return;
+      }
+      setStatus("");
 
       // Inject animation styles once
       if (!document.getElementById("marker-animations")) {
@@ -205,7 +217,7 @@ export default function MapView({ initialEvents }: Props) {
       }
 
       // Launch markers one by one
-      const geoEvents = evts.filter(e => e.lat_lon);
+      const geoEvents = filtered.filter(e => e.lat_lon);
       geoEvents.forEach((event, i) => {
         addMarker(event, i * 50); // 50ms between each pop
         if (isFixedVenue(event)) fixedCount++; else ephemeralCount++;
@@ -225,7 +237,21 @@ export default function MapView({ initialEvents }: Props) {
     <>
       <div ref={mapDiv} style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 0 }} />
 
-      {status && (
+      {status === "no-approved" && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, pointerEvents: "none" }}>
+          <div style={{ background: "rgba(15,15,18,0.92)", backdropFilter: "blur(20px)", borderRadius: 24, padding: "32px 28px", textAlign: "center", maxWidth: 300, border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🗺️</div>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Carte vide</h3>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: "1.6", marginBottom: 20 }}>
+              Aucun événement approuvé pour l'instant. L'admin doit d'abord sélectionner des événements.
+            </p>
+            <a href="/admin/curation" style={{ display: "inline-block", padding: "12px 22px", borderRadius: 14, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", pointerEvents: "all" }}>
+              Aller à la curation →
+            </a>
+          </div>
+        </div>
+      )}
+      {status && status !== "no-approved" && (
         <div style={{ position: "fixed", top: 80, left: 16, right: 16, zIndex: 100, background: "rgba(0,0,0,0.8)", color: "#fff", fontSize: 12, padding: 12, borderRadius: 12 }}>
           {status}
         </div>
@@ -247,7 +273,7 @@ export default function MapView({ initialEvents }: Props) {
         </div>
       </div>
 
-      {events.length > 0 && !status && (
+      {events.length > 0 && status === "" && (
         <div className="fixed z-40 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-xl rounded-full px-3 py-1 shadow-md text-xs font-medium text-gray-600" style={{ top: "calc(110px + var(--safe-top))" }}>
           {events.length} événement{events.length > 1 ? "s" : ""}
         </div>
