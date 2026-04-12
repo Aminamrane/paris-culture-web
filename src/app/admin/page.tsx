@@ -9,7 +9,7 @@ const CARDS = [
     title: "Curation carte",
     desc: "Swipe gauche/droite pour approuver les événements sur la carte",
     accent: "#E85D3A",
-    badge: "Tinder mode",
+    badge: null,
   },
   {
     href: "/admin/users",
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
             key={card.href}
             href={card.href}
             className="relative overflow-hidden rounded-2xl p-5 flex items-start gap-4 active:scale-[0.98] transition-transform"
-            style={{ background: "#1a1d27", borderBottom: `3px solid ${card.accent}` }}
+            style={{ background: "#1a1d27" }}
           >
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
