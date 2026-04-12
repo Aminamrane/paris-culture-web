@@ -91,11 +91,12 @@ export default function MapView({ initialEvents }: Props) {
         evts = await fetchEventsFromBrowser();
       }
 
-      // Filter to only admin-approved events
+      // Filter to only admin-approved events (from Supabase via API)
       let approved: Set<string>;
       try {
-        const curation: { externalId: string; decision: string }[] = JSON.parse(localStorage.getItem("lumina_curation") || "[]");
-        approved = new Set(curation.filter(r => r.decision === "approved").map(r => r.externalId));
+        const res = await fetch("/api/events/curation?approved=true");
+        const data = await res.json();
+        approved = new Set((data.items || []).map((r: { externalId: string }) => r.externalId));
       } catch { approved = new Set(); }
 
       const filtered = approved.size > 0 ? evts.filter(e => approved.has(e.id)) : [];

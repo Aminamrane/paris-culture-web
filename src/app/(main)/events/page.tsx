@@ -84,16 +84,14 @@ export default function EventsPage() {
   const [locError, setLocError] = useState(false);
 
   useEffect(() => {
-    fetch("/api/events?limit=100")
-      .then(r => r.json())
-      .then(d => {
-        const events: ParisEvent[] = d.events || [];
-        // Filter to admin-approved events only
-        try {
-          const curation: { externalId: string; decision: string }[] = JSON.parse(localStorage.getItem("lumina_curation") || "[]");
-          const approved = new Set(curation.filter(r => r.decision === "approved").map(r => r.externalId));
-          setAll(approved.size > 0 ? events.filter(e => approved.has(e.id)) : []);
-        } catch { setAll([]); }
+    Promise.all([
+      fetch("/api/events?limit=100").then(r => r.json()),
+      fetch("/api/events/curation?approved=true").then(r => r.json()),
+    ])
+      .then(([eventsData, curationData]) => {
+        const events: ParisEvent[] = eventsData.events || [];
+        const approved = new Set<string>((curationData.items || []).map((r: { externalId: string }) => r.externalId));
+        setAll(approved.size > 0 ? events.filter(e => approved.has(e.id)) : []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

@@ -34,15 +34,14 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<Date>(today);
 
   useEffect(() => {
-    fetch("/api/events?limit=100")
-      .then(r => r.json())
-      .then(d => {
-        const all: ParisEvent[] = d.events || [];
-        try {
-          const curation: { externalId: string; decision: string }[] = JSON.parse(localStorage.getItem("lumina_curation") || "[]");
-          const approved = new Set(curation.filter(r => r.decision === "approved").map(r => r.externalId));
-          setEvents(approved.size > 0 ? all.filter(e => approved.has(e.id)) : []);
-        } catch { setEvents([]); }
+    Promise.all([
+      fetch("/api/events?limit=100").then(r => r.json()),
+      fetch("/api/events/curation?approved=true").then(r => r.json()),
+    ])
+      .then(([eventsData, curationData]) => {
+        const all: ParisEvent[] = eventsData.events || [];
+        const approved = new Set<string>((curationData.items || []).map((r: { externalId: string }) => r.externalId));
+        setEvents(approved.size > 0 ? all.filter(e => approved.has(e.id)) : []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

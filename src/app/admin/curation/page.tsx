@@ -13,13 +13,12 @@ import {
 type Decision = "approved" | "rejected" | "skipped";
 interface CurationRecord { externalId: string; decision: Decision; eventData?: Partial<ParisEvent> }
 
-function getLocalDecisions(): CurationRecord[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("lumina_curation") || "[]"); } catch { return []; }
-}
-function saveDecision(rec: CurationRecord) {
-  const list = getLocalDecisions();
-  localStorage.setItem("lumina_curation", JSON.stringify([...list.filter(r => r.externalId !== rec.externalId), rec]));
+async function apiDecide(externalId: string, approved: boolean) {
+  await fetch("/api/events/curation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ externalId, approved }),
+  });
 }
 
 function formatDate(d: string | null): string {
@@ -191,37 +190,54 @@ export default function CurationPage() {
   const approved = decisions.filter(d => d.decision === "approved").length;
 
   useEffect(() => {
-    const existing = getLocalDecisions();
-    setDecisions(existing);
-    const seen = new Set(existing.map(r => r.externalId));
-    const now = new Date().toISOString().split("T")[0];
-    const url = `https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=${encodeURIComponent(`date_end>="${now}" AND lat_lon IS NOT NULL`)}&order_by=${encodeURIComponent("date_start ASC")}`;
-    fetch(url).then(r => r.json()).then(data => {
-      const events: ParisEvent[] = data.results || [];
-      setAll(events);
-      const pending = events.filter(e => !seen.has(e.id));
-      setQueue(pending);
-      if (pending.length === 0) setDone(true);
-    }).catch(() => {}).finally(() => setLoading(false));
+    async function loadAll() {
+      // Load existing decisions from Supabase via API
+      let existingDecisions: CurationRecord[] = [];
+      try {
+        const res = await fetch("/api/events/curation");
+        const data = await res.json();
+        existingDecisions = (data.items || []).map((item: { externalId: string; approved: boolean }) => ({
+          externalId: item.externalId,
+          decision: item.approved ? "approved" : "rejected",
+        }));
+        setDecisions(existingDecisions);
+      } catch {}
+
+      // Fetch events from OpenData, skip already-decided ones
+      const seen = new Set(existingDecisions.map(r => r.externalId));
+      const now = new Date().toISOString().split("T")[0];
+      const url = `https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=${encodeURIComponent(`date_end>="${now}" AND lat_lon IS NOT NULL`)}&order_by=${encodeURIComponent("date_start ASC")}`;
+      try {
+        const data = await fetch(url).then(r => r.json());
+        const events: ParisEvent[] = data.results || [];
+        setAll(events);
+        const pending = events.filter(e => !seen.has(e.id));
+        setQueue(pending);
+        if (pending.length === 0) setDone(true);
+      } catch {}
+      setLoading(false);
+    }
+    loadAll();
   }, []);
 
   const handleDecide = useCallback((decision: Decision) => {
     if (queue.length === 0) return;
     const event = queue[0];
     const record: CurationRecord = { externalId: event.id, decision };
-    saveDecision(record);
     setDecisions(prev => [...prev.filter(d => d.externalId !== event.id), record]);
     setLastDecision(decision);
     setTimeout(() => setLastDecision(null), 500);
-    fetch("/api/events/curation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ externalId: event.id, approved: decision === "approved" }) }).catch(() => {});
+    if (decision !== "skipped") {
+      apiDecide(event.id, decision === "approved").catch(() => {});
+    }
     const next = queue.slice(1);
     setQueue(next);
     if (next.length === 0) setDone(true);
   }, [queue]);
 
   const handleToggleOff = useCallback((externalId: string) => {
-    saveDecision({ externalId, decision: "rejected" });
     setDecisions(prev => [...prev.filter(d => d.externalId !== externalId), { externalId, decision: "rejected" }]);
+    apiDecide(externalId, false).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -283,7 +299,7 @@ export default function CurationPage() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>{approved} événement{approved > 1 ? "s" : ""} ajouté{approved > 1 ? "s" : ""} à la carte.</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
                   <Link href="/" style={{ padding: "14px 32px", borderRadius: 16, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>Voir la carte →</Link>
-                  <button onClick={() => { localStorage.removeItem("lumina_curation"); setDecisions([]); setQueue(all); setDone(false); }} style={{ padding: "12px 24px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "none", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Recommencer</button>
+                  <button onClick={() => window.location.reload()} style={{ padding: "12px 24px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "none", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Voir nouveaux événements</button>
                 </div>
               </div>
             ) : (

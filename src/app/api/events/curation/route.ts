@@ -1,51 +1,59 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user?.id || (session.user as { role?: string }).role !== "ADMIN") {
+  if (!session?.user?.id || (session.user as { role?: string }).role !== "admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const body = await req.json();
-  const { externalId, approved, eventData, source = "opendata" } = body;
+  const { externalId, approved } = body;
   if (!externalId || approved === undefined) {
     return NextResponse.json({ error: "externalId and approved required" }, { status: 400 });
   }
 
-  try {
-    const { prisma } = await import("@/lib/prisma");
-    if (!prisma) throw new Error("No DB");
+  const { error } = await supabaseAdmin
+    .from("event_curation")
+    .upsert(
+      { external_id: externalId, approved, curated_at: new Date().toISOString() },
+      { onConflict: "external_id" }
+    );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (prisma as any).eventCuration.upsert({
-      where: { externalId },
-      create: { externalId, approved, source, curatedBy: session.user.id, eventData },
-      update: { approved, eventData },
-    });
-
-    return NextResponse.json({ ok: true });
-  } catch {
-    // DB not available — decisions are stored in localStorage on client
-    return NextResponse.json({ ok: true, local: true });
+  if (error) {
+    console.error("Supabase curation error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  return NextResponse.json({ ok: true });
 }
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const approved = searchParams.get("approved");
+  const approvedFilter = searchParams.get("approved");
 
-  try {
-    const { prisma } = await import("@/lib/prisma");
-    if (!prisma) throw new Error("No DB");
+  let query = supabaseAdmin
+    .from("event_curation")
+    .select("external_id, approved, curated_at")
+    .order("curated_at", { ascending: false });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const items = await (prisma as any).eventCuration.findMany({
-      where: approved !== null ? { approved: approved === "true" } : undefined,
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json({ items });
-  } catch {
+  if (approvedFilter !== null) {
+    query = query.eq("approved", approvedFilter === "true");
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Supabase fetch error:", error);
     return NextResponse.json({ items: [] });
   }
+
+  const items = (data || []).map((row) => ({
+    externalId: row.external_id,
+    approved: row.approved,
+    curatedAt: row.curated_at,
+  }));
+
+  return NextResponse.json({ items });
 }
