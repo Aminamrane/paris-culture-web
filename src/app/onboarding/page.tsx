@@ -92,7 +92,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0e27", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100dvh", background: "#0a0e27", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Progress dots */}
       <div style={{ padding: "24px 24px 16px", display: "flex", justifyContent: "center", gap: 8 }}>
         {STEPS.map((_, i) => (

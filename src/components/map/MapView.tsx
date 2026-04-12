@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import FloatingHeader from "@/components/layout/FloatingHeader";
 import BottomTabs from "@/components/layout/BottomTabs";
 import {
@@ -39,6 +40,8 @@ export default function MapView({ initialEvents }: Props) {
   const [events, setEvents] = useState<ParisEvent[]>(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState<ParisEvent | null>(null);
   const [status, setStatus] = useState("Loading...");
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as { role?: string })?.role === "admin";
 
   useEffect(() => {
     const container = mapDiv.current;
@@ -241,13 +244,19 @@ export default function MapView({ initialEvents }: Props) {
         <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, pointerEvents: "none" }}>
           <div style={{ background: "rgba(15,15,18,0.92)", backdropFilter: "blur(20px)", borderRadius: 24, padding: "32px 28px", textAlign: "center", maxWidth: 300, border: "1px solid rgba(255,255,255,0.08)" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🗺️</div>
-            <h3 style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Carte vide</h3>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: "1.6", marginBottom: 20 }}>
-              Aucun événement approuvé pour l'instant. L'admin doit d'abord sélectionner des événements.
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 8 }}>
+              {isAdmin ? "Carte vide" : "Bientôt disponible"}
+            </h3>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: "1.6", marginBottom: isAdmin ? 20 : 0 }}>
+              {isAdmin
+                ? "Aucun événement approuvé. Sélectionnez des événements dans la curation."
+                : "Nos équipes préparent la sélection d'événements. Revenez bientôt !"}
             </p>
-            <a href="/admin/curation" style={{ display: "inline-block", padding: "12px 22px", borderRadius: 14, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", pointerEvents: "all" }}>
-              Aller à la curation →
-            </a>
+            {isAdmin && (
+              <a href="/admin/curation" style={{ display: "inline-block", padding: "12px 22px", borderRadius: 14, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", pointerEvents: "all" }}>
+                Aller à la curation →
+              </a>
+            )}
           </div>
         </div>
       )}
