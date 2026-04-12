@@ -77,7 +77,7 @@ export default function LoginPage() {
         transition: "opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.34,1.2,0.64,1)",
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.jpeg" alt="Lumina" style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 16 }} />
+        <img src="/logo.jpeg" alt="Lumina" style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 16, display: "block", margin: "0 auto 16px" }} />
         <h1 style={{ fontSize: 30, fontWeight: 900, color: "#fff", letterSpacing: -0.5, margin: 0 }}>Lumina</h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6, letterSpacing: 2 }}>CULTURE PARISIENNE</p>
       </div>
