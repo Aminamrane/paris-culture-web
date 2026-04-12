@@ -10,7 +10,7 @@ export default function FloatingHeader() {
     >
       {/* Profile button */}
       <Link
-        href="/login"
+        href="/profile"
         className="relative w-11 h-11 bg-white/90 backdrop-blur-xl rounded-full shadow-md shadow-black/10 flex items-center justify-center active:scale-95 transition-transform"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

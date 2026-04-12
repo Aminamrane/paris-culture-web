@@ -111,7 +111,7 @@ export default function ProfilePage() {
     );
   }
 
-  const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
+  const isAdmin = (session?.user as { role?: string })?.role === "admin";
   const isCertified = (session?.user as { certified?: boolean })?.certified;
 
   return (
