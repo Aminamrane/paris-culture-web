@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { supabaseAdmin } from "./supabase";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET || "lumina-secret-key-fallback-2025",
@@ -21,13 +22,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
-          const { prisma } = await import("./prisma");
           const bcrypt = await import("bcryptjs");
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const user = await (prisma as any).user.findUnique({
-            where: { email: credentials.email as string },
-          });
+          const { data: user } = await supabaseAdmin
+            .from("users")
+            .select("id, email, name, password, role, certified")
+            .eq("email", credentials.email as string)
+            .single();
 
           if (!user) return null;
 
@@ -46,7 +47,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             certified: user.certified,
           };
         } catch {
-          // DB not available
           return null;
         }
       },
