@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   type ParisEvent,
   getEventCover,
@@ -28,8 +29,14 @@ function stripHtml(html: string): string {
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
   const [event, setEvent] = useState<ParisEvent | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Reservation popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [notifSending, setNotifSending] = useState(false);
+  const [notifSent, setNotifSent] = useState(false);
 
   // Pull-to-dismiss
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -259,11 +266,13 @@ export default function EventDetailPage() {
           )}
 
           <div className="flex gap-2">
-            {event.access_link && (
-              <a href={event.access_link} target="_blank" rel="noopener noreferrer"
-                className="flex-1 bg-[#2563EB] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform">
+            {(event.access_link || event.contact_url) && (
+              <button
+                onClick={() => setShowPopup(true)}
+                className="flex-1 bg-[#2563EB] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
+              >
                 Réserver / S'inscrire
-              </a>
+              </button>
             )}
             {event.contact_url && (
               <a href={event.contact_url} target="_blank" rel="noopener noreferrer"
@@ -274,6 +283,102 @@ export default function EventDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Reservation popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-[200] flex items-end justify-center" style={{ background: "rgba(0,0,0,0.5)" }} onClick={() => !notifSending && setShowPopup(false)}>
+          <div
+            className="w-full max-w-md bg-white rounded-t-3xl px-6 pt-6 pb-8"
+            style={{ paddingBottom: "calc(24px + var(--safe-bottom))" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center mb-5">
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: "#d1d5db" }} />
+            </div>
+
+            {notifSent ? (
+              <div className="text-center py-4">
+                <div className="text-4xl mb-3">✅</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Email envoyé !</h3>
+                <p className="text-sm text-gray-500 mb-5">
+                  Un email avec le lien d'inscription a été envoyé à <strong>{session?.user?.email}</strong>
+                </p>
+                <button
+                  onClick={() => { setShowPopup(false); setNotifSent(false); }}
+                  className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#2563EB] active:scale-[0.98] transition-transform"
+                >
+                  Fermer
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="text-center mb-5">
+                  <div className="text-4xl mb-3">🔔</div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Recevoir un rappel ?</h3>
+                  <p className="text-sm text-gray-500">
+                    Souhaitez-vous recevoir un email avec le lien d'inscription pour <strong>{event.title}</strong> ?
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={async () => {
+                      if (!session?.user?.email) {
+                        // Not logged in — redirect to event directly
+                        window.open(event.access_link || event.contact_url || "", "_blank");
+                        setShowPopup(false);
+                        return;
+                      }
+                      setNotifSending(true);
+                      try {
+                        await fetch("/api/events/notify", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            eventTitle: event.title,
+                            eventDate: event.date_start || "",
+                            eventLocation: event.address_name || "",
+                            eventLink: event.access_link || event.contact_url || "",
+                            eventCover: getEventCover(event) || "",
+                          }),
+                        });
+                        setNotifSent(true);
+                      } catch {
+                        // Fallback — open link directly
+                        window.open(event.access_link || event.contact_url || "", "_blank");
+                        setShowPopup(false);
+                      }
+                      setNotifSending(false);
+                    }}
+                    disabled={notifSending}
+                    className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-[#2563EB] active:scale-[0.98] transition-transform disabled:opacity-60"
+                  >
+                    {notifSending ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Envoi en cours...
+                      </span>
+                    ) : (
+                      "Oui, m'envoyer le lien par email"
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      window.open(event.access_link || event.contact_url || "", "_blank");
+                      setShowPopup(false);
+                    }}
+                    className="w-full py-3.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-100 active:scale-[0.98] transition-transform"
+                  >
+                    Non, aller sur le site directement
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
