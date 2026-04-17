@@ -119,7 +119,7 @@ export default function EventDetailPage() {
             <div className="bg-stone-50 rounded-xl p-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Date</p>
               {event.date_description ? (
-                <p className="text-sm">{event.date_description}</p>
+                <p className="text-sm">{stripHtml(event.date_description)}</p>
               ) : (
                 <p className="text-sm">
                   {formatDateTime(event.date_start)}
@@ -155,7 +155,7 @@ export default function EventDetailPage() {
           {event.price_detail && (
             <div className="bg-stone-50 rounded-xl p-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Tarif</p>
-              <p className="text-sm">{event.price_detail}</p>
+              <p className="text-sm">{stripHtml(event.price_detail)}</p>
             </div>
           )}
 
@@ -163,7 +163,7 @@ export default function EventDetailPage() {
           {event.transport && (
             <div className="bg-stone-50 rounded-xl p-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Transport</p>
-              <p className="text-sm">{event.transport}</p>
+              <p className="text-sm">{stripHtml(event.transport)}</p>
             </div>
           )}
 
