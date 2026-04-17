@@ -59,7 +59,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
         transition: "opacity 0.3s",
       }}>
         <div style={{
-          height: "100%", borderRadius: 2, background: "#E85D3A",
+          height: "100%", borderRadius: 2, background: "#2563EB",
           width: `${barWidth}%`,
           transition: "width 1.8s cubic-bezier(0.25,0.1,0.25,1)",
         }} />

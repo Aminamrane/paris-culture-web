@@ -23,7 +23,7 @@ export default function CalendarScreen() {
           <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center' }}>
             <Ionicons name="person-outline" size={18} color="#333" />
           </View>
-          <View style={{ position: 'absolute', top: -2, right: -6, width: 10, height: 10, borderRadius: 5, backgroundColor: '#E85D3A', borderWidth: 2, borderColor: '#fff' }} />
+          <View style={{ position: 'absolute', top: -2, right: -6, width: 10, height: 10, borderRadius: 5, backgroundColor: '#2563EB', borderWidth: 2, borderColor: '#fff' }} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}>
           <Text style={{ fontSize: 15, fontWeight: '600', color: '#1a1a1a' }}>Paris</Text>

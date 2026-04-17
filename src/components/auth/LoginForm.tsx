@@ -47,7 +47,7 @@ export default function LoginForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <input
         type="password"
@@ -55,19 +55,19 @@ export default function LoginForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
       >
         {loading ? "Connexion..." : "Se connecter"}
       </button>
 
       <p className="text-sm text-center text-gray-500">
         Pas encore de compte ?{" "}
-        <Link href="/register" className="text-orange-600 hover:underline">
+        <Link href="/register" className="text-blue-600 hover:underline">
           S'inscrire
         </Link>
       </p>

@@ -72,7 +72,7 @@ export const PARIS_CENTER: MapViewState = {
 };
 
 export const CATEGORIES = {
-  expo: { label: "Expositions", color: "#E85D3A", icon: "🎨" },
+  expo: { label: "Expositions", color: "#2563EB", icon: "🎨" },
   theatre: { label: "Théâtre", color: "#8B5CF6", icon: "🎭" },
   musique: { label: "Musique", color: "#3B82F6", icon: "🎵" },
   debats: { label: "Débats", color: "#22C55E", icon: "💬" },

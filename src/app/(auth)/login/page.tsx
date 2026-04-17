@@ -98,7 +98,7 @@ export default function LoginPage() {
               style={{
                 flex: 1, padding: "12px 0", border: "none", cursor: "pointer",
                 borderRadius: 12, fontWeight: 700, fontSize: 15, zIndex: 1, position: "relative",
-                background: mode === m ? "#E85D3A" : "transparent",
+                background: mode === m ? "#2563EB" : "transparent",
                 color: mode === m ? "#fff" : "rgba(255,255,255,0.4)",
                 transition: "all 0.25s",
               }}>
@@ -139,8 +139,8 @@ export default function LoginPage() {
             <button type="submit" disabled={loading} style={{
               width: "100%", padding: "18px 0", border: "none", cursor: loading ? "default" : "pointer",
               borderRadius: 16, fontSize: 16, fontWeight: 700, color: "#fff",
-              background: "#E85D3A",
-              boxShadow: "0 8px 24px rgba(232,93,58,0.4)",
+              background: "#2563EB",
+              boxShadow: "0 8px 24px rgba(37,99,235,0.4)",
               opacity: loading ? 0.8 : 1,
               transition: "opacity 0.2s, transform 0.1s",
               marginTop: 4,
@@ -187,7 +187,7 @@ function AuthField({ icon, placeholder, value, onChange, type, rightAction }: {
       display: "flex", alignItems: "center",
       background: focused ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)",
       borderRadius: 16, padding: "0 16px", height: 56, marginBottom: 14,
-      border: `1.5px solid ${focused ? "rgba(232,93,58,0.5)" : "rgba(255,255,255,0.08)"}`,
+      border: `1.5px solid ${focused ? "rgba(37,99,235,0.5)" : "rgba(255,255,255,0.08)"}`,
       transition: "all 0.2s",
     }}>
       <span style={{ fontSize: 16, marginRight: 12, opacity: 0.6 }}>{icon}</span>

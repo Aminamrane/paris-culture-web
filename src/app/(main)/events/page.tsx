@@ -54,11 +54,11 @@ function EventCard({ event, km }: { event: ParisEvent; km?: number }) {
   return (
     <Link href={`/events/${encodeURIComponent(event.id)}`} className="block bg-white rounded-2xl overflow-hidden active:scale-[0.97] transition-transform" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
       <div className="relative" style={{ aspectRatio: "16/10", background: "#f3f4f6" }}>
-        {cover ? <img src={cover} alt={event.title} className="w-full h-full object-cover" loading="lazy" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100"><span className="text-3xl opacity-30">🎭</span></div>}
+        {cover ? <img src={cover} alt={event.title} className="w-full h-full object-cover" loading="lazy" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100"><span className="text-3xl opacity-30">🎭</span></div>}
         {event.price_type === "gratuit" && <span className="absolute top-2 left-2 text-[9px] font-bold bg-green-500 text-white px-1.5 py-0.5 rounded-full">Gratuit</span>}
         {km !== undefined && <span className="absolute top-2 right-8 text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full" style={{ background: "rgba(0,0,0,0.5)" }}>{km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`}</span>}
         <button onClick={toggleSave} className="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-all" style={{ background: "rgba(255,255,255,0.9)" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? "#E85D3A" : "none"} stroke={saved ? "#E85D3A" : "#6b7280"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? "#2563EB" : "none"} stroke={saved ? "#2563EB" : "#6b7280"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
         </button>
       </div>
       <div className="p-2.5">
@@ -139,19 +139,19 @@ export default function EventsPage() {
           ))}
         </div>
         {loading ? (
-          <div className="flex items-center justify-center py-20"><div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" /></div>
+          <div className="flex items-center justify-center py-20"><div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" /></div>
         ) : (
           <>
             {tab === "pour-toi" && <div className="px-4 grid grid-cols-2 gap-3">{pourToi().map(e => <EventCard key={e.id} event={e} />)}</div>}
             {tab === "autour" && (
               <div className="px-4">
-                {locLoading && <div className="flex flex-col items-center py-16 gap-3"><div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" /><p className="text-sm text-gray-400">Localisation en cours…</p></div>}
+                {locLoading && <div className="flex flex-col items-center py-16 gap-3"><div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" /><p className="text-sm text-gray-400">Localisation en cours…</p></div>}
                 {locError && !locLoading && (
                   <div className="text-center py-14 px-4">
                     <div className="text-4xl mb-3">📍</div>
                     <p className="text-sm font-semibold text-gray-700">Localisation refusée</p>
                     <p className="text-xs text-gray-400 mt-1 mb-4">Autorisez l'accès à votre position</p>
-                    <button onClick={requestLoc} className="px-5 py-2.5 rounded-full text-sm font-semibold text-white" style={{ background: "#E85D3A" }}>Réessayer</button>
+                    <button onClick={requestLoc} className="px-5 py-2.5 rounded-full text-sm font-semibold text-white" style={{ background: "#2563EB" }}>Réessayer</button>
                   </div>
                 )}
                 {!locLoading && !locError && loc && <div className="grid grid-cols-2 gap-3">{autour().map(({ event, km }) => <EventCard key={event.id} event={event} km={km} />)}</div>}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import FloatingHeader from "@/components/layout/FloatingHeader";
 import BottomTabs from "@/components/layout/BottomTabs";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@/lib/paris-opendata";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  expo: "#E85D3A", theatre: "#8B5CF6", musique: "#3B82F6", debats: "#22C55E",
+  expo: "#2563EB", theatre: "#8B5CF6", musique: "#3B82F6", debats: "#22C55E",
   street: "#EAB308", litterature: "#A855F7", immersif: "#EC4899",
   famille: "#F97316", cinema: "#6366F1", autre: "#6B7280",
 };
@@ -254,7 +255,7 @@ export default function MapView({ initialEvents }: Props) {
                 : "Nos équipes préparent la sélection d'événements. Revenez bientôt !"}
             </p>
             {isAdmin && (
-              <a href="/admin/curation" style={{ display: "inline-block", padding: "12px 22px", borderRadius: 14, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", pointerEvents: "all" }}>
+              <a href="/admin/curation" style={{ display: "inline-block", padding: "12px 22px", borderRadius: 14, background: "linear-gradient(135deg,#2563EB,#60A5FA)", color: "#fff", fontWeight: 700, fontSize: 13, textDecoration: "none", pointerEvents: "all" }}>
                 Aller à la curation →
               </a>
             )}
@@ -291,8 +292,8 @@ export default function MapView({ initialEvents }: Props) {
 
       {selectedEvent && (
         <div className="fixed z-50 left-4 right-4 bg-white rounded-2xl shadow-xl overflow-hidden" style={{ bottom: "calc(90px + var(--safe-bottom))" }}>
-          <button onClick={() => setSelectedEvent(null)} className="absolute top-2 right-2 z-10 w-7 h-7 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white text-sm">✕</button>
-          <div className="flex">
+          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedEvent(null); }} className="absolute top-2 right-2 z-10 w-7 h-7 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white text-sm">✕</button>
+          <Link href={`/events/${encodeURIComponent(selectedEvent.id)}`} className="flex" style={{ textDecoration: "none", color: "inherit" }}>
             {getEventCover(selectedEvent) && (
               <div className="w-28 shrink-0"><img src={getEventCover(selectedEvent)!} alt="" className="w-full h-full object-cover" style={{ minHeight: 120 }} /></div>
             )}
@@ -314,7 +315,7 @@ export default function MapView({ initialEvents }: Props) {
                 {selectedEvent.address_name && <span className="truncate">📍 {selectedEvent.address_name}</span>}
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       )}
 

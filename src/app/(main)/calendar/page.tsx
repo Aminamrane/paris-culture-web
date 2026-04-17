@@ -6,7 +6,7 @@ import Link from "next/link";
 import { type ParisEvent, categorizeEvent, getEventCover, getPriceLabel } from "@/lib/paris-opendata";
 
 const CAT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  expo:        { bg: "#FEF3F0", text: "#E85D3A", dot: "#E85D3A" },
+  expo:        { bg: "#EFF6FF", text: "#2563EB", dot: "#2563EB" },
   theatre:     { bg: "#F3F0FE", text: "#8B5CF6", dot: "#8B5CF6" },
   musique:     { bg: "#EFF6FF", text: "#3B82F6", dot: "#3B82F6" },
   debats:      { bg: "#F0FDF4", text: "#22C55E", dot: "#22C55E" },
@@ -113,7 +113,7 @@ export default function CalendarPage() {
           {/* Day headers */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", padding: "0 12px", marginBottom: 4 }}>
             {DAYS.map((d, i) => (
-              <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: i >= 5 ? "#E85D3A" : "#9ca3af", padding: "4px 0" }}>{d}</div>
+              <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: i >= 5 ? "#2563EB" : "#9ca3af", padding: "4px 0" }}>{d}</div>
             ))}
           </div>
 
@@ -133,10 +133,10 @@ export default function CalendarPage() {
                   style={{
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
                     padding: "6px 2px", border: "none", cursor: "pointer", borderRadius: 12,
-                    background: isSelected ? "#E85D3A" : isToday ? "#FEF3F0" : "transparent",
+                    background: isSelected ? "#2563EB" : isToday ? "#EFF6FF" : "transparent",
                     transition: "all 0.15s",
                   }}>
-                  <span style={{ fontSize: 14, fontWeight: isToday || isSelected ? 800 : 500, color: isSelected ? "#fff" : isToday ? "#E85D3A" : isWeekend ? "#E85D3A" : "#374151" }}>
+                  <span style={{ fontSize: 14, fontWeight: isToday || isSelected ? 800 : 500, color: isSelected ? "#fff" : isToday ? "#2563EB" : isWeekend ? "#2563EB" : "#374151" }}>
                     {day.getDate()}
                   </span>
                   {hasDots && (
@@ -162,7 +162,7 @@ export default function CalendarPage() {
 
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center", padding: "32px 0" }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2.5px solid #E85D3A", borderTopColor: "transparent", animation: "spin 0.7s linear infinite" }} />
+              <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2.5px solid #2563EB", borderTopColor: "transparent", animation: "spin 0.7s linear infinite" }} />
             </div>
           ) : selectedEvents.length === 0 ? (
             <div style={{ textAlign: "center", padding: "32px 16px", background: "#fff", borderRadius: 20 }}>

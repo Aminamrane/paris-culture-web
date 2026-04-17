@@ -48,7 +48,7 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function EventDetailPage() {
     return (
       <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6">
         <p className="text-gray-400 mb-4">Événement non trouvé</p>
-        <button onClick={() => router.back()} className="text-[#E85D3A] text-sm font-medium">
+        <button onClick={() => router.back()} className="text-[#2563EB] text-sm font-medium">
           ← Retour
         </button>
       </div>
@@ -197,7 +197,7 @@ export default function EventDetailPage() {
               href={event.access_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 bg-[#E85D3A] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
+              className="flex-1 bg-[#2563EB] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
             >
               Réserver / S'inscrire
             </a>

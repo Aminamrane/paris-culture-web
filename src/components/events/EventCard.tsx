@@ -35,7 +35,7 @@ export default function EventCard({
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
             <span className="text-4xl opacity-50">🎭</span>
           </div>
         )}
@@ -51,7 +51,7 @@ export default function EventCard({
         )}
       </div>
       <div className="p-3">
-        <h3 className="font-semibold text-sm leading-tight mb-1 group-hover:text-orange-600 transition-colors">
+        <h3 className="font-semibold text-sm leading-tight mb-1 group-hover:text-blue-600 transition-colors">
           {truncate(title, 60)}
         </h3>
         {leadText && (

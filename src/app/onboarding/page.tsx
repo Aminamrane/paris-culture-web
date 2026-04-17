@@ -99,7 +99,7 @@ export default function OnboardingPage() {
           <div key={i} style={{
             height: 8, borderRadius: 4,
             width: i === step ? 24 : 8,
-            background: i === step ? "#E85D3A" : i < step ? "rgba(232,93,58,0.5)" : "rgba(255,255,255,0.15)",
+            background: i === step ? "#2563EB" : i < step ? "rgba(37,99,235,0.5)" : "rgba(255,255,255,0.15)",
             transition: "all 0.3s",
           }} />
         ))}
@@ -126,8 +126,8 @@ export default function OnboardingPage() {
                 width: "100%", display: "flex", alignItems: "center",
                 padding: "16px 18px", borderRadius: 16, marginBottom: 12,
                 cursor: "pointer", textAlign: "left",
-                background: selected ? "rgba(232,93,58,0.15)" : "rgba(255,255,255,0.06)",
-                border: `1.5px solid ${selected ? "#E85D3A" : "rgba(255,255,255,0.08)"}`,
+                background: selected ? "rgba(37,99,235,0.15)" : "rgba(255,255,255,0.06)",
+                border: `1.5px solid ${selected ? "#2563EB" : "rgba(255,255,255,0.08)"}`,
                 opacity: mounted ? 1 : 0,
                 transform: mounted ? "scale(1)" : "scale(0.85)",
                 transition: `opacity 0.3s ease-out ${idx * 50}ms, transform 0.3s ease-out ${idx * 50}ms, background 0.2s, border-color 0.2s`,
@@ -135,7 +135,7 @@ export default function OnboardingPage() {
               <div style={{
                 width: 40, height: 40, borderRadius: 12, marginRight: 14,
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-                background: selected ? "rgba(232,93,58,0.2)" : "rgba(255,255,255,0.06)",
+                background: selected ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.06)",
                 flexShrink: 0,
               }}>{opt.icon}</div>
               <span style={{ fontSize: 15, fontWeight: 600, color: selected ? "#fff" : "rgba(255,255,255,0.6)", flex: 1 }}>
@@ -144,7 +144,7 @@ export default function OnboardingPage() {
               <div style={{
                 width: 24, height: 24, borderRadius: 12, flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: selected ? "#E85D3A" : "transparent",
+                background: selected ? "#2563EB" : "transparent",
                 border: selected ? "none" : "1.5px solid rgba(255,255,255,0.15)",
                 transition: "all 0.2s",
               }}>
@@ -172,8 +172,8 @@ export default function OnboardingPage() {
             padding: "16px 32px", borderRadius: 16, border: "none",
             cursor: canContinue ? "pointer" : "default",
             fontSize: 16, fontWeight: 700, color: canContinue ? "#fff" : "rgba(255,255,255,0.25)",
-            background: canContinue ? "#E85D3A" : "rgba(255,255,255,0.08)",
-            boxShadow: canContinue ? "0 6px 20px rgba(232,93,58,0.4)" : "none",
+            background: canContinue ? "#2563EB" : "rgba(255,255,255,0.08)",
+            boxShadow: canContinue ? "0 6px 20px rgba(37,99,235,0.4)" : "none",
             transition: "all 0.2s",
           }}>
           {isLast ? "C'est parti !" : "Continuer"}

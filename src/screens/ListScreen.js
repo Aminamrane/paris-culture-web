@@ -90,7 +90,7 @@ export default function ListScreen({ navigation, userPrefs }) {
     : currentList;
 
   var TABS = [
-    { key: 'pour-toi', label: 'Pour toi', icon: 'sparkles-outline', color: '#E85D3A' },
+    { key: 'pour-toi', label: 'Pour toi', icon: 'sparkles-outline', color: '#2563EB' },
     { key: 'autour', label: 'Autour de toi', icon: 'navigate-circle-outline', color: '#3B82F6' },
     { key: 'tendances', label: 'Tendances', icon: 'trending-up-outline', color: '#A855F7' },
   ];
@@ -109,7 +109,7 @@ export default function ListScreen({ navigation, userPrefs }) {
           <Text style={{ fontSize: 28, fontWeight: '800', color: '#1a1a1a' }}>Evenements</Text>
           <TouchableOpacity
             onPress={function () { navigation.navigate('SubmitEvent'); }}
-            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#E85D3A', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#2563EB', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}
             activeOpacity={0.8}
           >
             <Ionicons name="add" size={16} color="#fff" style={{ marginRight: 4 }} />
@@ -175,7 +175,7 @@ export default function ListScreen({ navigation, userPrefs }) {
       <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 }}>
         {activeTab === 'pour-toi' ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="sparkles" size={13} color="#E85D3A" style={{ marginRight: 6 }} />
+            <Ionicons name="sparkles" size={13} color="#2563EB" style={{ marginRight: 6 }} />
             <Text style={{ fontSize: 13, color: '#888', fontWeight: '500' }}>
               Selectionnes d'apres vos centres d'interet
             </Text>

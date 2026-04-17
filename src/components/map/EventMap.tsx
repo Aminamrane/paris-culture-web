@@ -58,7 +58,7 @@ export default function EventMap({ markers }: EventMapProps) {
       el.style.width = "14px";
       el.style.height = "14px";
       el.style.borderRadius = "50%";
-      el.style.backgroundColor = "#E85D3A";
+      el.style.backgroundColor = "#2563EB";
       el.style.border = "2px solid white";
       el.style.boxShadow = "0 2px 4px rgba(0,0,0,0.3)";
       el.style.cursor = "pointer";

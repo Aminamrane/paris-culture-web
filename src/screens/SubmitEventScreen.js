@@ -54,17 +54,17 @@ export default function SubmitEventScreen({ navigation }) {
           </Text>
           <View style={{ backgroundColor: '#f8f8f8', borderRadius: 16, padding: 20, marginTop: 28, width: '100%' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-              <Ionicons name="time-outline" size={16} color="#E85D3A" style={{ marginRight: 8 }} />
+              <Ionicons name="time-outline" size={16} color="#2563EB" style={{ marginRight: 8 }} />
               <Text style={{ fontSize: 13, color: '#555', fontWeight: '600' }}>Delai de validation : 24-48h</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="shield-checkmark-outline" size={16} color="#E85D3A" style={{ marginRight: 8 }} />
+              <Ionicons name="shield-checkmark-outline" size={16} color="#2563EB" style={{ marginRight: 8 }} />
               <Text style={{ fontSize: 13, color: '#555', fontWeight: '600' }}>Verifie par l'equipe Lumina</Text>
             </View>
           </View>
           <TouchableOpacity
             onPress={function () { navigation.goBack(); }}
-            style={{ marginTop: 32, backgroundColor: '#E85D3A', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 16 }}
+            style={{ marginTop: 32, backgroundColor: '#2563EB', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 16 }}
             activeOpacity={0.8}
           >
             <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>Retour a l'accueil</Text>
@@ -89,7 +89,7 @@ export default function SubmitEventScreen({ navigation }) {
         </View>
         {/* Progress bar */}
         <View style={{ height: 4, backgroundColor: '#f0f0f0', borderRadius: 2, marginTop: 14 }}>
-          <View style={{ height: 4, backgroundColor: '#E85D3A', borderRadius: 2, width: ((step + 1) / STEPS.length) * (W - 40) }} />
+          <View style={{ height: 4, backgroundColor: '#2563EB', borderRadius: 2, width: ((step + 1) / STEPS.length) * (W - 40) }} />
         </View>
       </View>
 
@@ -179,7 +179,7 @@ export default function SubmitEventScreen({ navigation }) {
             </FormField>
 
             <Text style={{ fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 8, marginTop: 4 }}>Description *</Text>
-            <View style={{ backgroundColor: '#f8f8f8', borderRadius: 14, padding: 16, borderWidth: 1.5, borderColor: description.length > 10 ? '#E85D3A20' : '#f0f0f0' }}>
+            <View style={{ backgroundColor: '#f8f8f8', borderRadius: 14, padding: 16, borderWidth: 1.5, borderColor: description.length > 10 ? '#2563EB20' : '#f0f0f0' }}>
               <TextInput
                 style={{ fontSize: 15, color: '#1a1a1a', minHeight: 120, textAlignVertical: 'top', lineHeight: 22 }}
                 placeholder="Decrivez votre evenement : programme, artistes, atmosphere..."
@@ -219,7 +219,7 @@ export default function SubmitEventScreen({ navigation }) {
                 ].map(function (row, i) {
                   return (
                     <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 10, borderBottomWidth: i < 3 ? 1 : 0, borderBottomColor: '#f0f0f0' }}>
-                      <Ionicons name={row.icon} size={15} color="#E85D3A" style={{ marginRight: 12, marginTop: 1 }} />
+                      <Ionicons name={row.icon} size={15} color="#2563EB" style={{ marginRight: 12, marginTop: 1 }} />
                       <Text style={{ fontSize: 12, color: '#999', width: 60, fontWeight: '500' }}>{row.label}</Text>
                       <Text style={{ flex: 1, fontSize: 13, color: '#1a1a1a', fontWeight: '600', lineHeight: 20 }}>{row.value}</Text>
                     </View>
@@ -256,14 +256,14 @@ export default function SubmitEventScreen({ navigation }) {
             <TouchableOpacity
               onPress={(step === 0 && canNext1) || (step === 1 && canNext2) ? goNext : undefined}
               activeOpacity={((step === 0 && canNext1) || (step === 1 && canNext2)) ? 0.75 : 1}
-              style={{ flex: 1, paddingVertical: 16, borderRadius: 14, backgroundColor: ((step === 0 && canNext1) || (step === 1 && canNext2)) ? '#E85D3A' : '#f0f0f0', alignItems: 'center' }}
+              style={{ flex: 1, paddingVertical: 16, borderRadius: 14, backgroundColor: ((step === 0 && canNext1) || (step === 1 && canNext2)) ? '#2563EB' : '#f0f0f0', alignItems: 'center' }}
             >
               <Text style={{ fontSize: 16, fontWeight: '700', color: ((step === 0 && canNext1) || (step === 1 && canNext2)) ? '#fff' : '#ccc' }}>Continuer</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
               onPress={handleSubmit}
-              style={{ flex: 1, paddingVertical: 16, borderRadius: 14, backgroundColor: '#E85D3A', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
+              style={{ flex: 1, paddingVertical: 16, borderRadius: 14, backgroundColor: '#2563EB', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
               activeOpacity={0.8}
             >
               <Ionicons name="send" size={16} color="#fff" style={{ marginRight: 8 }} />

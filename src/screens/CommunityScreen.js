@@ -26,7 +26,7 @@ export default function CommunityScreen() {
           <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center' }}>
             <Ionicons name="person-outline" size={18} color="#333" />
           </View>
-          <View style={{ position: 'absolute', top: -2, right: -6, width: 10, height: 10, borderRadius: 5, backgroundColor: '#E85D3A', borderWidth: 2, borderColor: '#fff' }} />
+          <View style={{ position: 'absolute', top: -2, right: -6, width: 10, height: 10, borderRadius: 5, backgroundColor: '#2563EB', borderWidth: 2, borderColor: '#fff' }} />
         </View>
         <TouchableOpacity>
           <Ionicons name="person-add-outline" size={22} color="#333" />
@@ -35,7 +35,7 @@ export default function CommunityScreen() {
 
       <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, backgroundColor: '#f8f8f8', borderRadius: 14, padding: 12, marginBottom: 20 }}>
         <View style={{ width: 50, height: 50, borderRadius: 12, backgroundColor: '#FFF0EC', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-          <Ionicons name="heart" size={22} color="#E85D3A" />
+          <Ionicons name="heart" size={22} color="#2563EB" />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#1a1a1a' }}>Vos coups de coeur sont prets !</Text>

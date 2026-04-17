@@ -17,7 +17,7 @@ export default function FloatingHeader() {
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
-        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#E85D3A] rounded-full border-2 border-white" />
+        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#2563EB] rounded-full border-2 border-white" />
       </Link>
 
       {/* Filter button */}

@@ -123,7 +123,7 @@ function PourToiStrip({ events, navigation }) {
   return (
     <View style={{ position: 'absolute', left: 0, right: 0, bottom: TAB_HEIGHT + 10 }}>
       <View style={{ paddingHorizontal: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
-        <Ionicons name="sparkles" size={12} color="#E85D3A" style={{ marginRight: 5 }} />
+        <Ionicons name="sparkles" size={12} color="#2563EB" style={{ marginRight: 5 }} />
         <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>Pour vous</Text>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
@@ -203,7 +203,7 @@ function VenueSheet({ venue, onClose, navigation, sheetAnim, overlayAnim }) {
               </View>
               {venue.major ? (
                 <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, backgroundColor: '#FFF0EC' }}>
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#E85D3A' }}>Lieu emblematique</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#2563EB' }}>Lieu emblematique</Text>
                 </View>
               ) : null}
             </View>
@@ -217,13 +217,13 @@ function VenueSheet({ venue, onClose, navigation, sheetAnim, overlayAnim }) {
               onPress={function () { setLiked(!liked); }}
               style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center', marginRight: 8 }}
             >
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={17} color={liked ? '#E85D3A' : '#666'} />
+              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={17} color={liked ? '#2563EB' : '#666'} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={function () { setSaved(!saved); }}
               style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center' }}
             >
-              <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={17} color={saved ? '#E85D3A' : '#666'} />
+              <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={17} color={saved ? '#2563EB' : '#666'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -377,9 +377,9 @@ export default function MapScreen({ navigation, userPrefs }) {
             <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
               <Ionicons name="person-outline" size={18} color="#333" />
             </View>
-            <View style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: 5, backgroundColor: '#E85D3A', borderWidth: 2, borderColor: '#fff' }} />
+            <View style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: 5, backgroundColor: '#2563EB', borderWidth: 2, borderColor: '#fff' }} />
           </TouchableOpacity>
-          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#E85D3A', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#2563EB', justifyContent: 'center', alignItems: 'center' }}>
             <Ionicons name="sparkles" size={16} color="#fff" />
           </View>
         </View>

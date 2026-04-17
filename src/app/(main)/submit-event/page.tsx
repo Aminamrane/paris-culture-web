@@ -76,7 +76,7 @@ export default function SubmitEventPage() {
             <h1 className="text-xl font-bold">Proposer un événement</h1>
             <p className="text-sm text-gray-400 mt-1">Connectez-vous pour soumettre un événement</p>
           </div>
-          <Link href="/login?redirect=/submit-event" className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white text-center block" style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)" }}>
+          <Link href="/login?redirect=/submit-event" className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white text-center block" style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)" }}>
             Se connecter
           </Link>
         </div>
@@ -88,7 +88,7 @@ export default function SubmitEventPage() {
     return (
       <MobileShell>
         <div className="px-4 pt-12 text-center flex flex-col items-center gap-5">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl" style={{ background: isCertified ? "rgba(34,197,94,0.1)" : "rgba(232,93,58,0.1)" }}>
+          <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl" style={{ background: isCertified ? "rgba(34,197,94,0.1)" : "rgba(37,99,235,0.1)" }}>
             {isCertified ? "✅" : "⏳"}
           </div>
           <div>
@@ -100,7 +100,7 @@ export default function SubmitEventPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2.5 w-full">
-            <Link href="/events" className="py-3.5 rounded-2xl text-sm font-semibold text-white text-center block" style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)" }}>
+            <Link href="/events" className="py-3.5 rounded-2xl text-sm font-semibold text-white text-center block" style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)" }}>
               Voir les événements
             </Link>
             <button onClick={() => { setForm(EMPTY); setStep(1); setSuccess(false); }} className="py-3.5 rounded-2xl text-sm font-medium text-gray-700 bg-white" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
@@ -135,7 +135,7 @@ export default function SubmitEventPage() {
           {/* Progress */}
           <div className="flex gap-1.5 mt-3">
             {[1, 2, 3].map(n => (
-              <div key={n} className="flex-1 h-1 rounded-full transition-all" style={{ background: step >= n ? "#E85D3A" : "#e5e7eb" }} />
+              <div key={n} className="flex-1 h-1 rounded-full transition-all" style={{ background: step >= n ? "#2563EB" : "#e5e7eb" }} />
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-1">Étape {step} sur 3</p>
@@ -152,7 +152,7 @@ export default function SubmitEventPage() {
                 placeholder="Ex: Exposition Picasso au Grand Palais"
                 className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all"
                 style={{ background: "#f9fafb", border: "1.5px solid #f3f4f6", fontFamily: "inherit" }}
-                onFocus={e => (e.target.style.borderColor = "#E85D3A")}
+                onFocus={e => (e.target.style.borderColor = "#2563EB")}
                 onBlur={e => (e.target.style.borderColor = "#f3f4f6")}
               />
             </div>
@@ -166,7 +166,7 @@ export default function SubmitEventPage() {
                     onClick={() => set("category", cat.key)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left"
                     style={form.category === cat.key
-                      ? { background: "rgba(232,93,58,0.1)", border: "1.5px solid #E85D3A", color: "#E85D3A" }
+                      ? { background: "rgba(37,99,235,0.1)", border: "1.5px solid #2563EB", color: "#2563EB" }
                       : { background: "#f9fafb", border: "1.5px solid #f3f4f6", color: "#374151" }
                     }
                   >
@@ -186,7 +186,7 @@ export default function SubmitEventPage() {
                 rows={4}
                 className="w-full px-4 py-3 rounded-2xl text-sm outline-none resize-none transition-all"
                 style={{ background: "#f9fafb", border: "1.5px solid #f3f4f6", fontFamily: "inherit" }}
-                onFocus={e => (e.target.style.borderColor = "#E85D3A")}
+                onFocus={e => (e.target.style.borderColor = "#2563EB")}
                 onBlur={e => (e.target.style.borderColor = "#f3f4f6")}
               />
             </div>
@@ -195,7 +195,7 @@ export default function SubmitEventPage() {
               onClick={() => setStep(2)}
               disabled={!form.title || !form.category}
               className="w-full py-3.5 rounded-2xl text-sm font-semibold text-white transition-all"
-              style={{ background: form.title && form.category ? "linear-gradient(135deg,#E85D3A,#f07a5a)" : "#e5e7eb", color: form.title && form.category ? "#fff" : "#9ca3af" }}
+              style={{ background: form.title && form.category ? "linear-gradient(135deg,#2563EB,#60A5FA)" : "#e5e7eb", color: form.title && form.category ? "#fff" : "#9ca3af" }}
             >
               Continuer
             </button>
@@ -231,7 +231,7 @@ export default function SubmitEventPage() {
               <div className="flex gap-2">
                 {[{ key: "gratuit", label: "Gratuit" }, { key: "payant", label: "Payant" }].map(p => (
                   <button key={p.key} onClick={() => set("priceType", p.key as "gratuit" | "payant")} className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
-                    style={form.priceType === p.key ? { background: "rgba(232,93,58,0.1)", border: "1.5px solid #E85D3A", color: "#E85D3A" } : { background: "#f9fafb", border: "1.5px solid #f3f4f6", color: "#374151" }}>
+                    style={form.priceType === p.key ? { background: "rgba(37,99,235,0.1)", border: "1.5px solid #2563EB", color: "#2563EB" } : { background: "#f9fafb", border: "1.5px solid #f3f4f6", color: "#374151" }}>
                     {p.label}
                   </button>
                 ))}
@@ -246,7 +246,7 @@ export default function SubmitEventPage() {
                 Retour
               </button>
               <button onClick={() => setStep(3)} disabled={!form.dateStart || !form.addressName} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold text-white"
-                style={{ background: form.dateStart && form.addressName ? "linear-gradient(135deg,#E85D3A,#f07a5a)" : "#e5e7eb", color: form.dateStart && form.addressName ? "#fff" : "#9ca3af" }}>
+                style={{ background: form.dateStart && form.addressName ? "linear-gradient(135deg,#2563EB,#60A5FA)" : "#e5e7eb", color: form.dateStart && form.addressName ? "#fff" : "#9ca3af" }}>
                 Continuer
               </button>
             </div>
@@ -301,7 +301,7 @@ export default function SubmitEventPage() {
                 onClick={submit}
                 disabled={loading}
                 className="flex-1 py-3.5 rounded-2xl text-sm font-semibold text-white flex items-center justify-center gap-2"
-                style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)", boxShadow: "0 4px 14px rgba(232,93,58,0.3)" }}
+                style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)", boxShadow: "0 4px 14px rgba(37,99,235,0.3)" }}
               >
                 {loading ? <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : "Soumettre"}
               </button>

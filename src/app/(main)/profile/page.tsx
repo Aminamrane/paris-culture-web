@@ -46,17 +46,17 @@ function SavedCard({ event, onUnsave }: { event: SavedEventData; onUnsave: () =>
   return (
     <div className="flex gap-3 bg-white rounded-2xl p-3 shadow-sm active:scale-[0.98] transition-transform">
       <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-        {event.coverUrl ? <img src={event.coverUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-xl">🎭</div>}
+        {event.coverUrl ? <img src={event.coverUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-xl">🎭</div>}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-medium text-[#E85D3A] mb-0.5 capitalize">{event.category}</p>
+        <p className="text-[11px] font-medium text-[#2563EB] mb-0.5 capitalize">{event.category}</p>
         <h3 className="text-sm font-semibold leading-tight line-clamp-2">{event.title}</h3>
         <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400">
           {event.dateStart && <span>{formatDate(event.dateStart)}</span>}
           {event.addressName && <span className="truncate">📍 {event.addressName}</span>}
         </div>
       </div>
-      <button onClick={onUnsave} className="shrink-0 w-8 h-8 flex items-center justify-center text-[#E85D3A] active:scale-90 transition-all" style={{ alignSelf: "center" }}>
+      <button onClick={onUnsave} className="shrink-0 w-8 h-8 flex items-center justify-center text-[#2563EB] active:scale-90 transition-all" style={{ alignSelf: "center" }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
       </button>
     </div>
@@ -87,23 +87,23 @@ export default function ProfilePage() {
   };
 
   if (status === "loading") {
-    return <MobileShell><div className="flex items-center justify-center py-24"><div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" /></div></MobileShell>;
+    return <MobileShell><div className="flex items-center justify-center py-24"><div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" /></div></MobileShell>;
   }
 
   if (!user) {
     return (
       <MobileShell>
         <div className="px-4 pt-8 pb-4 flex flex-col items-center text-center gap-5">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-xl" style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)" }}>?</div>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-xl" style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)" }}>?</div>
           <div><h1 className="text-xl font-bold">Mon profil</h1><p className="text-sm text-gray-400 mt-1">Connectez-vous pour accéder à votre profil</p></div>
           {savedEvents.length > 0 && (
-            <div className="w-full rounded-2xl p-3 text-left" style={{ background: "rgba(232,93,58,0.06)", border: "1px solid rgba(232,93,58,0.15)" }}>
-              <p className="text-xs font-semibold text-[#E85D3A] mb-0.5">{savedEvents.length} événement{savedEvents.length > 1 ? "s" : ""} sauvegardé{savedEvents.length > 1 ? "s" : ""}</p>
+            <div className="w-full rounded-2xl p-3 text-left" style={{ background: "rgba(37,99,235,0.06)", border: "1px solid rgba(37,99,235,0.15)" }}>
+              <p className="text-xs font-semibold text-[#2563EB] mb-0.5">{savedEvents.length} événement{savedEvents.length > 1 ? "s" : ""} sauvegardé{savedEvents.length > 1 ? "s" : ""}</p>
               <p className="text-xs text-gray-500">Connectez-vous pour les retrouver sur tous vos appareils</p>
             </div>
           )}
           <div className="w-full space-y-2.5">
-            <Link href="/login" className="block w-full text-center py-3.5 rounded-2xl text-sm font-semibold text-white" style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)", boxShadow: "0 4px 14px rgba(232,93,58,0.35)" }}>Se connecter</Link>
+            <Link href="/login" className="block w-full text-center py-3.5 rounded-2xl text-sm font-semibold text-white" style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}>Se connecter</Link>
             <Link href="/register" className="block w-full bg-white text-center py-3.5 rounded-2xl text-sm font-medium text-gray-700" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>Créer un compte</Link>
           </div>
         </div>
@@ -119,11 +119,11 @@ export default function ProfilePage() {
       <div className="pb-4">
         <div className="px-4 pt-4 pb-4">
           <div className="flex items-start gap-3">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shrink-0 shadow-lg" style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)" }}>{initials}</div>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shrink-0 shadow-lg" style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)" }}>{initials}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-lg font-bold truncate">{user.name || "Utilisateur"}</h1>
-                {isCertified && <span title="Certifié Lumina" style={{ color: "#E85D3A" }}><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg></span>}
+                {isCertified && <span title="Certifié Lumina" style={{ color: "#2563EB" }}><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg></span>}
                 {isAdmin && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: "#1f2937" }}>ADMIN</span>}
               </div>
               <p className="text-xs text-gray-400 truncate mt-0.5">{user.email}</p>
@@ -152,7 +152,7 @@ export default function ProfilePage() {
               style={activeTab === tab.key ? { background: "#1f2937", color: "#fff" } : { background: "#f3f4f6", color: "#6b7280" }}>
               {tab.label}
               {"count" in tab && tab.count > 0 && (
-                <span className="rounded-full px-1 min-w-[16px] text-center text-[10px] font-bold" style={activeTab === tab.key ? { background: "rgba(255,255,255,0.2)", color: "#fff" } : { background: "#E85D3A", color: "#fff" }}>{tab.count}</span>
+                <span className="rounded-full px-1 min-w-[16px] text-center text-[10px] font-bold" style={activeTab === tab.key ? { background: "rgba(255,255,255,0.2)", color: "#fff" } : { background: "#2563EB", color: "#fff" }}>{tab.count}</span>
               )}
             </button>
           ))}
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                 <div className="text-4xl mb-3">🔖</div>
                 <p className="text-sm font-semibold text-gray-700">Aucun événement sauvegardé</p>
                 <p className="text-xs text-gray-400 mt-1">Appuyez sur le cœur dans un événement pour le sauvegarder</p>
-                <Link href="/" className="inline-block mt-4 px-5 py-2 rounded-full text-xs font-semibold text-white" style={{ background: "#E85D3A" }}>Explorer la carte</Link>
+                <Link href="/" className="inline-block mt-4 px-5 py-2 rounded-full text-xs font-semibold text-white" style={{ background: "#2563EB" }}>Explorer la carte</Link>
               </div>
             ) : savedEvents.map((ev) => <SavedCard key={ev.externalId} event={ev} onUnsave={() => unsaveEvent(ev.externalId)} />)}
           </div>
@@ -198,7 +198,7 @@ export default function ProfilePage() {
             <div className="p-5 bg-white rounded-3xl" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.08)" }}><QRCanvas url={profileUrl} /></div>
             <div className="text-center"><p className="text-sm font-semibold text-gray-800">{user.name}</p><p className="text-xs text-gray-400 mt-0.5">Scannez pour voir mon profil Lumina</p></div>
             <button onClick={copyLink} className="flex items-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-semibold text-white w-full justify-center transition-all active:scale-[0.98]"
-              style={{ background: copied ? "#22c55e" : "linear-gradient(135deg,#E85D3A,#f07a5a)", boxShadow: "0 4px 14px rgba(232,93,58,0.3)" }}>
+              style={{ background: copied ? "#22c55e" : "linear-gradient(135deg,#2563EB,#60A5FA)", boxShadow: "0 4px 14px rgba(37,99,235,0.3)" }}>
               {copied ? <>✓ Lien copié !</> : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg> Copier le lien</>}
             </button>
             {typeof navigator !== "undefined" && "share" in navigator && (

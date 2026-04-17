@@ -7,7 +7,7 @@ const TABS = [
     key: "map",
     path: "/",
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#E85D3A" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#2563EB" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z" />
         <path d="M8 2v16" /><path d="M16 6v16" />
       </svg>
@@ -18,7 +18,7 @@ const TABS = [
     key: "list",
     path: "/events",
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#E85D3A" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#2563EB" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -34,9 +34,9 @@ const TABS = [
       <div
         style={{
           width: 44, height: 44, borderRadius: 14,
-          background: "linear-gradient(135deg,#E85D3A,#f07a5a)",
+          background: "linear-gradient(135deg,#2563EB,#60A5FA)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 4px 14px rgba(232,93,58,0.4)",
+          boxShadow: "0 4px 14px rgba(37,99,235,0.4)",
           marginTop: -10,
         }}
       >
@@ -52,7 +52,7 @@ const TABS = [
     key: "calendar",
     path: "/calendar",
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#E85D3A" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#2563EB" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
@@ -65,7 +65,7 @@ const TABS = [
     key: "profile",
     path: "/profile",
     icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#E85D3A" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? "#2563EB" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
         <circle cx="12" cy="7" r="4" />
       </svg>
@@ -101,14 +101,14 @@ export default function BottomTabs() {
               <div
                 style={
                   isActive && tab.key !== "add"
-                    ? { background: "rgba(232,93,58,0.1)", borderRadius: 10, padding: "4px 10px" }
+                    ? { background: "rgba(37,99,235,0.1)", borderRadius: 10, padding: "4px 10px" }
                     : { padding: "4px 10px" }
                 }
               >
                 {tab.icon(isActive)}
               </div>
               {tab.label && (
-                <span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400, color: isActive ? "#E85D3A" : "#9CA3AF", letterSpacing: "-0.2px" }}>
+                <span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400, color: isActive ? "#2563EB" : "#9CA3AF", letterSpacing: "-0.2px" }}>
                   {tab.label}
                 </span>
               )}

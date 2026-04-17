@@ -47,12 +47,12 @@ export default function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Exposition, concert, lieu..."
-            className="flex-1 px-4 py-3 bg-white border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E85D3A]/50 shadow-sm"
+            className="flex-1 px-4 py-3 bg-white border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 shadow-sm"
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#E85D3A] text-white px-5 py-3 rounded-xl text-sm font-medium active:scale-95 transition-transform disabled:opacity-50"
+            className="bg-[#2563EB] text-white px-5 py-3 rounded-xl text-sm font-medium active:scale-95 transition-transform disabled:opacity-50"
           >
             {loading ? "..." : "OK"}
           </button>
@@ -94,7 +94,7 @@ export default function SearchPage() {
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : results.length === 0 ? (
               <p className="text-center text-gray-400 py-12">

@@ -32,7 +32,7 @@ export default function EventDetailScreen({ route, navigation }) {
             <Ionicons name="share-outline" size={18} color="#333" />
           </TouchableOpacity>
         </View>
-        <View style={{ position: 'absolute', bottom: 16, left: 16, backgroundColor: '#E85D3A', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 }}>
+        <View style={{ position: 'absolute', bottom: 16, left: 16, backgroundColor: '#2563EB', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 }}>
           <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{event.category}</Text>
         </View>
       </View>
@@ -82,10 +82,10 @@ export default function EventDetailScreen({ route, navigation }) {
 
           <View style={{ flexDirection: 'row', marginTop: 20 }}>
             <TouchableOpacity onPress={function () { setLiked(!liked); }} style={{ flex: 1, flexDirection: 'row', paddingVertical: 12, borderRadius: 12, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center', marginRight: 6 }}>
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? '#E85D3A' : '#555'} style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 15, fontWeight: '600', color: liked ? '#E85D3A' : '#555' }}>{liked ? 'Aime' : "J'aime"}</Text>
+              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? '#2563EB' : '#555'} style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 15, fontWeight: '600', color: liked ? '#2563EB' : '#555' }}>{liked ? 'Aime' : "J'aime"}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: '#E85D3A', alignItems: 'center', marginLeft: 6 }}>
+            <TouchableOpacity style={{ flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: '#2563EB', alignItems: 'center', marginLeft: 6 }}>
               <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff' }}>Participer</Text>
             </TouchableOpacity>
           </View>
@@ -130,7 +130,7 @@ export default function EventDetailScreen({ route, navigation }) {
           onChangeText={setNewComment}
           onSubmitEditing={handleAddComment}
         />
-        <TouchableOpacity onPress={handleAddComment} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: newComment.trim() ? '#E85D3A' : '#f0f0f0', justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
+        <TouchableOpacity onPress={handleAddComment} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: newComment.trim() ? '#2563EB' : '#f0f0f0', justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}>
           <Ionicons name="send" size={16} color={newComment.trim() ? '#fff' : '#999'} />
         </TouchableOpacity>
       </View>

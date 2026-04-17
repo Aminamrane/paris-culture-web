@@ -27,7 +27,7 @@ function formatDate(d: string | null): string {
 }
 
 const CAT_COLORS: Record<string, string> = {
-  expo: "#E85D3A", theatre: "#8B5CF6", musique: "#3B82F6", debats: "#22C55E",
+  expo: "#2563EB", theatre: "#8B5CF6", musique: "#3B82F6", debats: "#22C55E",
   street: "#EAB308", litterature: "#A855F7", immersif: "#EC4899",
   famille: "#F97316", cinema: "#6366F1", autre: "#6B7280",
 };
@@ -289,7 +289,7 @@ export default function CurationPage() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "12px 20px 0", position: "relative" }}>
             {loading ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid rgba(232,93,58,0.3)", borderTopColor: "#E85D3A", animation: "spin 0.7s linear infinite" }} />
+                <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid rgba(37,99,235,0.3)", borderTopColor: "#2563EB", animation: "spin 0.7s linear infinite" }} />
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>Chargement…</p>
               </div>
             ) : done ? (
@@ -298,7 +298,7 @@ export default function CurationPage() {
                 <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 8 }}>Tout vu !</h2>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>{approved} événement{approved > 1 ? "s" : ""} ajouté{approved > 1 ? "s" : ""} à la carte.</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
-                  <Link href="/" style={{ padding: "14px 32px", borderRadius: 16, background: "linear-gradient(135deg,#E85D3A,#f07a5a)", color: "#fff", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>Voir la carte →</Link>
+                  <Link href="/" style={{ padding: "14px 32px", borderRadius: 16, background: "linear-gradient(135deg,#2563EB,#60A5FA)", color: "#fff", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>Voir la carte →</Link>
                   <button onClick={() => window.location.reload()} style={{ padding: "12px 24px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "none", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>Voir nouveaux événements</button>
                 </div>
               </div>

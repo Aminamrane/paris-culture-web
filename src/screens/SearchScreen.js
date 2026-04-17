@@ -54,7 +54,7 @@ export default function SearchScreen({ navigation }) {
                 <Image source={{ uri: item.thumbnail }} style={{ width: 50, height: 50, borderRadius: 12, marginRight: 14 }} />
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 15, fontWeight: '700', color: '#1a1a1a' }}>{item.title}</Text>
-                  <Text style={{ fontSize: 12, color: '#E85D3A', fontWeight: '600', marginTop: 2 }}>{item.category}</Text>
+                  <Text style={{ fontSize: 12, color: '#2563EB', fontWeight: '600', marginTop: 2 }}>{item.category}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#ccc" />
               </TouchableOpacity>
@@ -68,7 +68,7 @@ export default function SearchScreen({ navigation }) {
             {TRENDING.map(function (tag, i) {
               return (
                 <TouchableOpacity key={i} onPress={function () { setQuery(tag); }} style={{ backgroundColor: '#FFF0EC', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, marginRight: 8, marginBottom: 8 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#E85D3A' }}>{tag}</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#2563EB' }}>{tag}</Text>
                 </TouchableOpacity>
               );
             })}

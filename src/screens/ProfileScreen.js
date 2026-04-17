@@ -142,12 +142,12 @@ var SAVED_VENUES = [
 ];
 
 var ACTIVITY = [
-  { id: 'a1', type: 'like', text: 'A aime Zoo Art Show', time: 'Il y a 2h', icon: 'heart', color: '#E85D3A', category: 'street' },
+  { id: 'a1', type: 'like', text: 'A aime Zoo Art Show', time: 'Il y a 2h', icon: 'heart', color: '#2563EB', category: 'street' },
   { id: 'a2', type: 'save', text: 'A sauvegarde Le Louvre', time: 'Il y a 5h', icon: 'bookmark', color: '#3498DB', category: 'expo' },
   { id: 'a3', type: 'view', text: 'A consulte Paradox Museum', time: 'Hier', icon: 'eye', color: '#27AE60', category: 'immersif' },
   { id: 'a4', type: 'comment', text: "A commente L'Odyssee Celeste", time: 'Il y a 2 jours', icon: 'chatbubble', color: '#9B59B6', category: 'musique' },
   { id: 'a5', type: 'save', text: 'A sauvegarde Philharmonie de Paris', time: 'Il y a 3 jours', icon: 'bookmark', color: '#3498DB', category: 'musique' },
-  { id: 'a6', type: 'like', text: 'A aime Science Experiences', time: 'Il y a 4 jours', icon: 'heart', color: '#E85D3A', category: 'immersif' },
+  { id: 'a6', type: 'like', text: 'A aime Science Experiences', time: 'Il y a 4 jours', icon: 'heart', color: '#2563EB', category: 'immersif' },
 ];
 
 var TABS = [
@@ -176,13 +176,13 @@ export default function ProfileScreen({ navigation, currentUser }) {
             </TouchableOpacity>
             <Text style={{ fontSize: 17, fontWeight: '700', color: '#1a1a1a' }}>Profil</Text>
             <TouchableOpacity onPress={function () { auth.logout(); navigation.goBack(); }}>
-              <Ionicons name="log-out-outline" size={22} color="#E85D3A" />
+              <Ionicons name="log-out-outline" size={22} color="#2563EB" />
             </TouchableOpacity>
           </View>
 
           {/* Avatar + name */}
           <View style={{ alignItems: 'center', marginBottom: 20 }}>
-            <View style={{ width: 90, height: 90, borderRadius: 45, marginBottom: 12, borderWidth: 3, borderColor: isAdmin ? '#F5A623' : '#E85D3A', backgroundColor: isAdmin ? '#1a1505' : '#e0e0e0', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ width: 90, height: 90, borderRadius: 45, marginBottom: 12, borderWidth: 3, borderColor: isAdmin ? '#F5A623' : '#2563EB', backgroundColor: isAdmin ? '#1a1505' : '#e0e0e0', justifyContent: 'center', alignItems: 'center' }}>
               <Ionicons name={isAdmin ? 'shield-checkmark' : 'person'} size={40} color={isAdmin ? '#F5A623' : '#999'} />
             </View>
             <Text style={{ fontSize: 22, fontWeight: '800', color: '#1a1a1a' }}>{displayName}</Text>
@@ -217,7 +217,7 @@ export default function ProfileScreen({ navigation, currentUser }) {
           {/* Action buttons */}
           {!isAdmin ? (
             <View style={{ flexDirection: 'row', marginTop: 16, marginBottom: 4 }}>
-              <TouchableOpacity style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#E85D3A', alignItems: 'center', marginRight: 5 }}>
+              <TouchableOpacity style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#2563EB', alignItems: 'center', marginRight: 5 }}>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Modifier le profil</Text>
               </TouchableOpacity>
               <TouchableOpacity style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#f5f5f5', alignItems: 'center', marginLeft: 5 }}>
@@ -232,10 +232,10 @@ export default function ProfileScreen({ navigation, currentUser }) {
           {TABS.map(function (t) {
             var active = tab === t.key;
             return (
-              <TouchableOpacity key={t.key} onPress={function () { setTab(t.key); }} style={{ flex: 1, paddingVertical: 14, alignItems: 'center', borderBottomWidth: active ? 2 : 0, borderBottomColor: '#E85D3A' }}>
+              <TouchableOpacity key={t.key} onPress={function () { setTab(t.key); }} style={{ flex: 1, paddingVertical: 14, alignItems: 'center', borderBottomWidth: active ? 2 : 0, borderBottomColor: '#2563EB' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name={t.icon} size={14} color={active ? '#E85D3A' : '#999'} style={{ marginRight: 4 }} />
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: active ? '#E85D3A' : '#999' }}>{t.label}</Text>
+                  <Ionicons name={t.icon} size={14} color={active ? '#2563EB' : '#999'} style={{ marginRight: 4 }} />
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: active ? '#2563EB' : '#999' }}>{t.label}</Text>
                 </View>
               </TouchableOpacity>
             );
@@ -246,10 +246,10 @@ export default function ProfileScreen({ navigation, currentUser }) {
         {tab === 'events' ? (
           <View style={{ padding: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 14 }}>
-              <Ionicons name="bookmark" size={15} color="#E85D3A" style={{ marginRight: 6 }} />
+              <Ionicons name="bookmark" size={15} color="#2563EB" style={{ marginRight: 6 }} />
               <Text style={{ fontSize: 16, fontWeight: '700', color: '#1a1a1a' }}>Evenements sauvegardes</Text>
               <View style={{ marginLeft: 8, backgroundColor: '#FFF0EC', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: '#E85D3A' }}>{SAVED_EVENTS.length}</Text>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#2563EB' }}>{SAVED_EVENTS.length}</Text>
               </View>
             </View>
             {SAVED_EVENTS.map(function (ev) {

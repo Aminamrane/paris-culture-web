@@ -93,7 +93,7 @@ export default function FeedPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-[#E85D3A] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16 px-4">
@@ -107,7 +107,7 @@ export default function FeedPage() {
                 : "L'activité de la communauté apparaîtra ici"}
             </p>
             {tab === "following" && !session?.user && (
-              <Link href="/login" className="inline-block mt-4 px-5 py-2 rounded-full text-xs font-semibold text-white" style={{ background: "#E85D3A" }}>
+              <Link href="/login" className="inline-block mt-4 px-5 py-2 rounded-full text-xs font-semibold text-white" style={{ background: "#2563EB" }}>
                 Se connecter
               </Link>
             )}
@@ -125,7 +125,7 @@ export default function FeedPage() {
                     {/* Avatar */}
                     <div
                       className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                      style={{ background: "linear-gradient(135deg,#E85D3A,#f07a5a)" }}
+                      style={{ background: "linear-gradient(135deg,#2563EB,#60A5FA)" }}
                     >
                       {initials(item.userName)}
                     </div>

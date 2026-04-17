@@ -8,7 +8,7 @@ const CARDS = [
     emoji: "🃏",
     title: "Curation carte",
     desc: "Swipe gauche/droite pour approuver les événements sur la carte",
-    accent: "#E85D3A",
+    accent: "#2563EB",
     badge: null,
   },
   {
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="px-6 pt-14 pb-8">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#E85D3A" }}>Admin Panel</span>
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#2563EB" }}>Admin Panel</span>
         </div>
         <h1 className="text-3xl font-black text-white">Lumina</h1>
         <p className="text-sm mt-1" style={{ color: "#6b7280" }}>Gérez votre application culturelle</p>

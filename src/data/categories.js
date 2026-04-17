@@ -1,5 +1,5 @@
 export var CATEGORIES = {
-  expo:        { label: 'Expositions & Arts visuels', color: '#E85D3A', icon: 'image-outline' },
+  expo:        { label: 'Expositions & Arts visuels', color: '#2563EB', icon: 'image-outline' },
   theatre:     { label: 'Theatre',                    color: '#9B59B6', icon: 'sparkles-outline' },
   musique:     { label: 'Musiques & concerts',        color: '#3498DB', icon: 'musical-notes-outline' },
   debats:      { label: 'Debats & conferences',       color: '#27AE60', icon: 'mic-outline' },

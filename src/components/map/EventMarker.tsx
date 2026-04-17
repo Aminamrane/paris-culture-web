@@ -10,7 +10,7 @@ interface EventMarkerProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  expo: "#E85D3A",
+  expo: "#2563EB",
   theatre: "#8B5CF6",
   musique: "#3B82F6",
   debats: "#22C55E",
@@ -27,7 +27,7 @@ export default function EventMarker({
   selected,
   onClick,
 }: EventMarkerProps) {
-  const color = CATEGORY_COLORS[category || ""] || "#E85D3A";
+  const color = CATEGORY_COLORS[category || ""] || "#2563EB";
 
   return (
     <button

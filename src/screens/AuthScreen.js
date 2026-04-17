@@ -114,7 +114,7 @@ export default function AuthScreen({ onSuccess }) {
               <Animated.View style={{
                 position: 'absolute', top: 4, left: tabIndicatorLeft,
                 width: tabIndicatorWidth, bottom: 4,
-                backgroundColor: '#E85D3A', borderRadius: 12,
+                backgroundColor: '#2563EB', borderRadius: 12,
               }} />
               <TouchableOpacity onPress={function () { switchMode('login'); }} style={{ flex: 1, paddingVertical: 12, alignItems: 'center', zIndex: 1 }} activeOpacity={0.7}>
                 <Text style={{ fontSize: 15, fontWeight: '700', color: mode === 'login' ? '#fff' : 'rgba(255,255,255,0.4)' }}>Connexion</Text>
@@ -165,7 +165,7 @@ export default function AuthScreen({ onSuccess }) {
               <TouchableOpacity
                 onPress={loading ? undefined : handleSubmit}
                 activeOpacity={0.8}
-                style={{ backgroundColor: '#E85D3A', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 4, shadowColor: '#E85D3A', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16 }}
+                style={{ backgroundColor: '#2563EB', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 4, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16 }}
               >
                 {loading ? (
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -220,9 +220,9 @@ function AuthField({ icon, placeholder, value, onChangeText, secureTextEntry, ke
       backgroundColor: focused ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)',
       borderRadius: 16, paddingHorizontal: 16, height: 56,
       marginBottom: 14, borderWidth: 1.5,
-      borderColor: focused ? 'rgba(232,93,58,0.5)' : 'rgba(255,255,255,0.08)',
+      borderColor: focused ? 'rgba(37,99,235,0.5)' : 'rgba(255,255,255,0.08)',
     }}>
-      <Ionicons name={icon} size={18} color={focused ? '#E85D3A' : 'rgba(255,255,255,0.35)'} style={{ marginRight: 12 }} />
+      <Ionicons name={icon} size={18} color={focused ? '#2563EB' : 'rgba(255,255,255,0.35)'} style={{ marginRight: 12 }} />
       <TextInput
         style={{ flex: 1, fontSize: 15, color: '#fff' }}
         placeholder={placeholder}
