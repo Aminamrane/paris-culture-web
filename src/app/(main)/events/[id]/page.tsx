@@ -31,18 +31,12 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<ParisEvent | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Pull-to-dismiss — all tracking via refs to avoid stale closures
+  // Pull-to-dismiss
   const scrollRef = useRef<HTMLDivElement>(null);
   const [pullY, setPullY] = useState(0);
-  const [dismissed, setDismissed] = useState(false);
-  const [entered, setEntered] = useState(false);
   const startY = useRef(0);
   const pulling = useRef(false);
   const pullYRef = useRef(0);
-
-  useEffect(() => {
-    requestAnimationFrame(() => setEntered(true));
-  }, []);
 
   useEffect(() => {
     async function load() {
@@ -58,14 +52,11 @@ export default function EventDetailPage() {
     load();
   }, [params.id]);
 
-  const dismiss = useCallback(() => {
-    setDismissed(true);
-    setPullY(0);
-    pullYRef.current = 0;
-    setTimeout(() => router.back(), 300);
+  const goBack = useCallback(() => {
+    router.back();
   }, [router]);
 
-  // Use native touch listeners to avoid React stale closure issues
+  // Pull-to-dismiss with native listeners
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -86,9 +77,7 @@ export default function EventDetailPage() {
         return;
       }
       const dy = Math.max(0, e.touches[0].clientY - startY.current);
-      if (dy > 10) {
-        e.preventDefault(); // prevent browser scroll/refresh
-      }
+      if (dy > 5) e.preventDefault();
       const dampened = dy * 0.45;
       pullYRef.current = dampened;
       setPullY(dampened);
@@ -98,9 +87,7 @@ export default function EventDetailPage() {
       if (!pulling.current) return;
       pulling.current = false;
       if (pullYRef.current > 100) {
-        setDismissed(true);
-        setPullY(pullYRef.current);
-        setTimeout(() => router.back(), 280);
+        router.back();
       } else {
         pullYRef.current = 0;
         setPullY(0);
@@ -129,7 +116,7 @@ export default function EventDetailPage() {
     return (
       <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6">
         <p className="text-gray-400 mb-4">Événement non trouvé</p>
-        <button onClick={() => router.back()} className="text-[#2563EB] text-sm font-medium">
+        <button onClick={goBack} className="text-[#2563EB] text-sm font-medium">
           ← Retour
         </button>
       </div>
@@ -142,26 +129,25 @@ export default function EventDetailPage() {
 
   return (
     <>
-      {/* Dark backdrop */}
-      <div
-        className="fixed inset-0 z-40"
-        style={{
-          background: `rgba(0,0,0,${0.3 * (1 - progress)})`,
-          opacity: entered && !dismissed ? 1 : 0,
-          transition: "opacity 0.3s",
-          pointerEvents: "none",
-        }}
-      />
+      {/* Back button — OUTSIDE scroll container so it always works */}
+      <button
+        onClick={goBack}
+        className="fixed top-0 left-0 z-[100] w-10 h-10 m-3 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white active:scale-90 transition-transform"
+        style={{ marginTop: "calc(12px + var(--safe-top))" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7" />
+        </svg>
+      </button>
 
       {/* Pull indicator */}
       {pullY > 10 && (
-        <div className="fixed top-0 left-0 right-0 z-[60] flex justify-center" style={{ paddingTop: Math.min(pullY * 0.25, 36), pointerEvents: "none" }}>
+        <div className="fixed top-0 left-0 right-0 z-[90] flex justify-center" style={{ paddingTop: Math.min(pullY * 0.3, 40), pointerEvents: "none" }}>
           <div style={{
             width: 36, height: 36, borderRadius: "50%",
-            background: progress >= 1 ? "#2563EB" : "rgba(0,0,0,0.1)",
+            background: progress >= 1 ? "#2563EB" : "rgba(0,0,0,0.08)",
             display: "flex", alignItems: "center", justifyContent: "center",
             transform: `scale(${0.5 + progress * 0.5})`,
-            transition: pulling.current ? "background 0.15s" : "all 0.3s",
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={progress >= 1 ? "#fff" : "#999"} strokeWidth="2.5" strokeLinecap="round">
               <path d="M6 9l6 6 6-6" />
@@ -170,34 +156,20 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {/* Page sheet */}
+      {/* Scrollable content */}
       <div
         ref={scrollRef}
         className="fixed inset-0 z-50 bg-white overflow-y-auto no-scrollbar"
         style={{
-          transform: dismissed
-            ? "translateY(100%)"
-            : entered
-              ? `translateY(${pullY}px) scale(${1 - progress * 0.04})`
-              : "translateY(100%)",
-          borderRadius: pullY > 0 ? `${Math.min(pullY * 0.25, 20)}px` : 0,
-          transition: pulling.current ? "border-radius 0.1s" : "all 0.35s cubic-bezier(0.32, 0.72, 0, 1)",
+          transform: pullY > 0 ? `translateY(${pullY}px)` : undefined,
+          borderRadius: pullY > 0 ? `${Math.min(pullY * 0.25, 20)}px` : undefined,
           overscrollBehavior: "none",
         }}
       >
         {/* Drag handle */}
-        <div className="sticky top-0 z-10 flex justify-center pt-2 pb-1">
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.15)" }} />
+        <div className="flex justify-center pt-2 pb-1">
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.12)" }} />
         </div>
-
-        {/* Back button */}
-        <button
-          onClick={dismiss}
-          className="fixed top-0 left-0 z-50 w-10 h-10 m-3 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white active:scale-95 transition-transform"
-          style={{ marginTop: "calc(20px + var(--safe-top))" }}
-        >
-          ←
-        </button>
 
         {/* Cover image */}
         {cover && (
@@ -209,19 +181,12 @@ export default function EventDetailPage() {
 
         {/* Content */}
         <div className="px-4 py-4 pb-20" style={{ paddingBottom: "calc(20px + var(--safe-bottom))" }}>
-          {/* Tags */}
           <div className="flex items-center gap-1.5 mb-2">
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 uppercase">
               {category}
             </span>
             {event.price_type && (
-              <span
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                  event.price_type === "gratuit"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${event.price_type === "gratuit" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
                 {getPriceLabel(event.price_type)}
               </span>
             )}
@@ -233,7 +198,6 @@ export default function EventDetailPage() {
             <p className="text-sm text-gray-600 mb-4">{event.lead_text}</p>
           )}
 
-          {/* Info cards */}
           <div className="space-y-3 mb-4">
             {(event.date_start || event.date_description) && (
               <div className="bg-stone-50 rounded-xl p-3">
@@ -243,9 +207,7 @@ export default function EventDetailPage() {
                 ) : (
                   <p className="text-sm">
                     {formatDateTime(event.date_start)}
-                    {event.date_end && (
-                      <span className="text-gray-400"> → {formatDateTime(event.date_end)}</span>
-                    )}
+                    {event.date_end && <span className="text-gray-400"> → {formatDateTime(event.date_end)}</span>}
                   </p>
                 )}
               </div>
@@ -257,9 +219,7 @@ export default function EventDetailPage() {
                 {event.address_name && <p className="text-sm font-medium">{event.address_name}</p>}
                 {event.address_street && (
                   <p className="text-xs text-gray-500">
-                    {event.address_street}
-                    {event.address_zipcode && `, ${event.address_zipcode}`}
-                    {event.address_city && ` ${event.address_city}`}
+                    {event.address_street}{event.address_zipcode && `, ${event.address_zipcode}`}{event.address_city && ` ${event.address_city}`}
                   </p>
                 )}
               </div>

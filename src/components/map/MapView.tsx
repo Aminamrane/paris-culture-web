@@ -92,12 +92,24 @@ export default function MapView({ initialEvents }: Props) {
         evts = await fetchEventsFromBrowser();
       }
 
-      // Filter to only admin-approved events (from Supabase via API)
+      // Filter to only admin-approved events — use cache for fast re-mount
       let approved: Set<string>;
       try {
-        const res = await fetch("/api/events/curation?approved=true");
-        const data = await res.json();
-        approved = new Set((data.items || []).map((r: { externalId: string }) => r.externalId));
+        const cached = sessionStorage.getItem("lumina_approved_ids");
+        if (cached) {
+          approved = new Set(JSON.parse(cached));
+        } else {
+          const res = await fetch("/api/events/curation?approved=true");
+          const data = await res.json();
+          const ids = (data.items || []).map((r: { externalId: string }) => r.externalId);
+          approved = new Set(ids);
+          sessionStorage.setItem("lumina_approved_ids", JSON.stringify(ids));
+        }
+        // Refresh cache in background
+        fetch("/api/events/curation?approved=true").then(r => r.json()).then(data => {
+          const ids = (data.items || []).map((r: { externalId: string }) => r.externalId);
+          sessionStorage.setItem("lumina_approved_ids", JSON.stringify(ids));
+        }).catch(() => {});
       } catch { approved = new Set(); }
 
       const filtered = approved.size > 0 ? evts.filter(e => approved.has(e.id)) : [];
