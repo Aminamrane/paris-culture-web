@@ -31,12 +31,18 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<ParisEvent | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Pull-to-dismiss state
+  // Pull-to-dismiss — all tracking via refs to avoid stale closures
   const scrollRef = useRef<HTMLDivElement>(null);
   const [pullY, setPullY] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  const [entered, setEntered] = useState(false);
   const startY = useRef(0);
   const pulling = useRef(false);
+  const pullYRef = useRef(0);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setEntered(true));
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -52,36 +58,64 @@ export default function EventDetailPage() {
     load();
   }, [params.id]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const el = scrollRef.current;
-    if (el && el.scrollTop <= 0) {
-      startY.current = e.touches[0].clientY;
-      pulling.current = true;
-    }
-  }, []);
+  const dismiss = useCallback(() => {
+    setDismissed(true);
+    setPullY(0);
+    pullYRef.current = 0;
+    setTimeout(() => router.back(), 300);
+  }, [router]);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!pulling.current) return;
+  // Use native touch listeners to avoid React stale closure issues
+  useEffect(() => {
     const el = scrollRef.current;
-    if (el && el.scrollTop > 0) {
+    if (!el) return;
+
+    function onTouchStart(e: TouchEvent) {
+      if (el!.scrollTop <= 0) {
+        startY.current = e.touches[0].clientY;
+        pulling.current = true;
+      }
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (!pulling.current) return;
+      if (el!.scrollTop > 0) {
+        pulling.current = false;
+        pullYRef.current = 0;
+        setPullY(0);
+        return;
+      }
+      const dy = Math.max(0, e.touches[0].clientY - startY.current);
+      if (dy > 10) {
+        e.preventDefault(); // prevent browser scroll/refresh
+      }
+      const dampened = dy * 0.45;
+      pullYRef.current = dampened;
+      setPullY(dampened);
+    }
+
+    function onTouchEnd() {
+      if (!pulling.current) return;
       pulling.current = false;
-      setPullY(0);
-      return;
+      if (pullYRef.current > 100) {
+        setDismissed(true);
+        setPullY(pullYRef.current);
+        setTimeout(() => router.back(), 280);
+      } else {
+        pullYRef.current = 0;
+        setPullY(0);
+      }
     }
-    const dy = Math.max(0, e.touches[0].clientY - startY.current);
-    setPullY(dy * 0.5); // dampen
-  }, []);
 
-  const handleTouchEnd = useCallback(() => {
-    if (!pulling.current) return;
-    pulling.current = false;
-    if (pullY > 120) {
-      setDismissed(true);
-      setTimeout(() => router.back(), 250);
-    } else {
-      setPullY(0);
-    }
-  }, [pullY, router]);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [router]);
 
   if (loading) {
     return (
@@ -104,53 +138,63 @@ export default function EventDetailPage() {
 
   const cover = getEventCover(event);
   const category = categorizeEvent(event.tags, event.qfap_tags);
-  const dismissProgress = Math.min(pullY / 120, 1);
+  const progress = Math.min(pullY / 100, 1);
 
   return (
     <>
-      {/* Dismiss indicator */}
-      {pullY > 0 && (
-        <div
-          style={{
-            position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
-            display: "flex", justifyContent: "center", paddingTop: Math.min(pullY * 0.3, 40),
-            pointerEvents: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 40, height: 40, borderRadius: "50%",
-              background: dismissProgress >= 1 ? "#2563EB" : "rgba(0,0,0,0.08)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transform: `scale(${0.6 + dismissProgress * 0.4}) rotate(${dismissProgress * 180}deg)`,
-              transition: pulling.current ? "none" : "all 0.3s",
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={dismissProgress >= 1 ? "#fff" : "#9ca3af"} strokeWidth="2.5" strokeLinecap="round">
-              <path d="M19 12H5M12 5l-7 7 7 7" />
+      {/* Dark backdrop */}
+      <div
+        className="fixed inset-0 z-40"
+        style={{
+          background: `rgba(0,0,0,${0.3 * (1 - progress)})`,
+          opacity: entered && !dismissed ? 1 : 0,
+          transition: "opacity 0.3s",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Pull indicator */}
+      {pullY > 10 && (
+        <div className="fixed top-0 left-0 right-0 z-[60] flex justify-center" style={{ paddingTop: Math.min(pullY * 0.25, 36), pointerEvents: "none" }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: "50%",
+            background: progress >= 1 ? "#2563EB" : "rgba(0,0,0,0.1)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transform: `scale(${0.5 + progress * 0.5})`,
+            transition: pulling.current ? "background 0.15s" : "all 0.3s",
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={progress >= 1 ? "#fff" : "#999"} strokeWidth="2.5" strokeLinecap="round">
+              <path d="M6 9l6 6 6-6" />
             </svg>
           </div>
         </div>
       )}
 
+      {/* Page sheet */}
       <div
         ref={scrollRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="fixed inset-0 bg-white overflow-y-auto no-scrollbar"
+        className="fixed inset-0 z-50 bg-white overflow-y-auto no-scrollbar"
         style={{
-          transform: `translateY(${pullY}px) scale(${1 - dismissProgress * 0.05})`,
-          borderRadius: pullY > 0 ? `${Math.min(pullY * 0.3, 24)}px` : 0,
-          transition: pulling.current ? "none" : "all 0.35s cubic-bezier(0.34,1.3,0.64,1)",
-          opacity: dismissed ? 0 : 1,
+          transform: dismissed
+            ? "translateY(100%)"
+            : entered
+              ? `translateY(${pullY}px) scale(${1 - progress * 0.04})`
+              : "translateY(100%)",
+          borderRadius: pullY > 0 ? `${Math.min(pullY * 0.25, 20)}px` : 0,
+          transition: pulling.current ? "border-radius 0.1s" : "all 0.35s cubic-bezier(0.32, 0.72, 0, 1)",
+          overscrollBehavior: "none",
         }}
       >
+        {/* Drag handle */}
+        <div className="sticky top-0 z-10 flex justify-center pt-2 pb-1">
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.15)" }} />
+        </div>
+
         {/* Back button */}
         <button
-          onClick={() => router.back()}
+          onClick={dismiss}
           className="fixed top-0 left-0 z-50 w-10 h-10 m-3 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white active:scale-95 transition-transform"
-          style={{ marginTop: "calc(12px + var(--safe-top))" }}
+          style={{ marginTop: "calc(20px + var(--safe-top))" }}
         >
           ←
         </button>
@@ -191,7 +235,6 @@ export default function EventDetailPage() {
 
           {/* Info cards */}
           <div className="space-y-3 mb-4">
-            {/* Date */}
             {(event.date_start || event.date_description) && (
               <div className="bg-stone-50 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Date</p>
@@ -201,23 +244,17 @@ export default function EventDetailPage() {
                   <p className="text-sm">
                     {formatDateTime(event.date_start)}
                     {event.date_end && (
-                      <span className="text-gray-400">
-                        {" → "}
-                        {formatDateTime(event.date_end)}
-                      </span>
+                      <span className="text-gray-400"> → {formatDateTime(event.date_end)}</span>
                     )}
                   </p>
                 )}
               </div>
             )}
 
-            {/* Location */}
             {(event.address_name || event.address_street) && (
               <div className="bg-stone-50 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Lieu</p>
-                {event.address_name && (
-                  <p className="text-sm font-medium">{event.address_name}</p>
-                )}
+                {event.address_name && <p className="text-sm font-medium">{event.address_name}</p>}
                 {event.address_street && (
                   <p className="text-xs text-gray-500">
                     {event.address_street}
@@ -228,7 +265,6 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            {/* Price */}
             {event.price_detail && (
               <div className="bg-stone-50 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Tarif</p>
@@ -236,7 +272,6 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            {/* Transport */}
             {event.transport && (
               <div className="bg-stone-50 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Transport</p>
@@ -244,7 +279,6 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            {/* Accessibility */}
             {(event.pmr || event.blind || event.deaf) && (
               <div className="bg-stone-50 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">Accessibilité</p>
@@ -257,35 +291,23 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          {/* Description */}
           {event.description && (
             <div className="mb-4">
               <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">Description</p>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {stripHtml(event.description)}
-              </p>
+              <p className="text-sm text-gray-700 leading-relaxed">{stripHtml(event.description)}</p>
             </div>
           )}
 
-          {/* Action buttons */}
           <div className="flex gap-2">
             {event.access_link && (
-              <a
-                href={event.access_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-[#2563EB] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
-              >
+              <a href={event.access_link} target="_blank" rel="noopener noreferrer"
+                className="flex-1 bg-[#2563EB] text-white text-center py-3 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform">
                 Réserver / S'inscrire
               </a>
             )}
             {event.contact_url && (
-              <a
-                href={event.contact_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-gray-100 text-gray-700 text-center py-3 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
-              >
+              <a href={event.contact_url} target="_blank" rel="noopener noreferrer"
+                className="flex-1 bg-gray-100 text-gray-700 text-center py-3 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform">
                 Site web
               </a>
             )}
