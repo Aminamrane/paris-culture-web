@@ -251,10 +251,11 @@ export default function MapView({ initialEvents }: Props) {
         }
         squircleBox.appendChild(imgBox);
 
-        // Date indicator — protrudes from top-right corner
+        // Date indicator — sits on the top-right rounded corner (half inside the
+        // squircle image, half overhanging the outer corner curve)
         const dateIndicator = document.createElement("div");
         dateIndicator.style.cssText = `
-          position:absolute;top:-7px;right:-7px;
+          position:absolute;top:-2px;right:-2px;
           width:16px;height:16px;border-radius:50%;
           background:${today ? "#22c55e" : "#9ca3af"};
           border:2.5px solid #fff;
