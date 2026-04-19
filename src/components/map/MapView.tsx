@@ -85,6 +85,37 @@ export default function MapView({ initialEvents }: Props) {
 
       await new Promise<void>(r => map.on("load", r));
 
+      // Apply soft blue theme — override base style colors after load
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const layers = (map.getStyle().layers || []) as any[];
+        layers.forEach((layer) => {
+          const id = layer.id as string;
+          const type = layer.type as string;
+          if (type === "background") {
+            map.setPaintProperty(id, "background-color", "#E6F0FB");
+          } else if (type === "fill") {
+            // Land / landcover / landuse — soft blue tint
+            if (id.includes("land") || id.includes("national-park") || id.includes("pitch")) {
+              map.setPaintProperty(id, "fill-color", "#EAF3FC");
+            } else if (id.includes("building")) {
+              map.setPaintProperty(id, "fill-color", "#FFFFFF");
+              map.setPaintProperty(id, "fill-opacity", 0.85);
+            } else if (id.includes("water")) {
+              map.setPaintProperty(id, "fill-color", "#C7DEF4");
+            }
+          } else if (type === "line") {
+            if (id.includes("road") || id.includes("street")) {
+              map.setPaintProperty(id, "line-color", "#FFFFFF");
+            } else if (id.includes("water")) {
+              map.setPaintProperty(id, "line-color", "#A8C7E8");
+            }
+          }
+        });
+      } catch (err) {
+        console.warn("Map theme override failed:", err);
+      }
+
       // Fetch all events
       let evts = initialEvents;
       if (!evts || evts.length === 0) {
