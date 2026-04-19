@@ -213,16 +213,27 @@ export default function MapView({ initialEvents }: Props) {
         // Squircle wrapper — doesn't clip, so date indicator can overflow outside
         const squircleBox = document.createElement("div");
         squircleBox.style.cssText = `
-          position:absolute;left:-33px;top:-33px;width:66px;height:66px;
+          position:absolute;left:-34px;top:-34px;width:68px;height:68px;
         `;
 
-        // Inner image box — this one clips the image to rounded corners
+        // Glass ring — thick transparent outline with backdrop blur (iOS glass effect)
+        const glassRing = document.createElement("div");
+        glassRing.style.cssText = `
+          position:absolute;inset:0;
+          border-radius:20px;
+          background:rgba(255,255,255,0.35);
+          backdrop-filter:blur(16px) saturate(180%);
+          -webkit-backdrop-filter:blur(16px) saturate(180%);
+          box-shadow:0 6px 22px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.1), inset 0 0 0 0.5px rgba(255,255,255,0.6);
+        `;
+        squircleBox.appendChild(glassRing);
+
+        // Inner image box — inset 3px from the glass ring, clips image
         const imgBox = document.createElement("div");
         imgBox.style.cssText = `
-          position:absolute;inset:0;
-          border-radius:18px;overflow:hidden;
-          background:#fff;border:1.5px solid #9ca3af;
-          box-shadow:0 4px 14px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
+          position:absolute;top:3px;left:3px;right:3px;bottom:3px;
+          border-radius:16px;overflow:hidden;
+          background:#fff;
           pointer-events:auto;
         `;
         if (cover) {
@@ -240,7 +251,7 @@ export default function MapView({ initialEvents }: Props) {
         }
         squircleBox.appendChild(imgBox);
 
-        // Date indicator — sibling of imgBox, NOT clipped. Sticks out from top-right.
+        // Date indicator — protrudes from top-right corner
         const dateIndicator = document.createElement("div");
         dateIndicator.style.cssText = `
           position:absolute;top:-7px;right:-7px;
@@ -254,17 +265,18 @@ export default function MapView({ initialEvents }: Props) {
 
         fullView.appendChild(squircleBox);
 
-        // Title — below squircle (at y=39, which is 33 + 6 gap)
+        // Title — modern sans-serif with black fill + white stroke outline
         const titleEl = document.createElement("span");
         const t = event.title || event.address_name || "";
         titleEl.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
         titleEl.style.cssText = `
-          position:absolute;top:39px;left:50%;transform:translateX(-50%);
-          padding:0 4px;max-width:120px;text-align:center;
-          font-family:Georgia, 'Times New Roman', serif;
-          font-style:italic;font-weight:700;
-          font-size:11px;color:#1f2937;line-height:1.2;
-          text-shadow:0 1px 2px rgba(255,255,255,0.95), 0 0 4px rgba(255,255,255,0.9);
+          position:absolute;top:40px;left:50%;transform:translateX(-50%);
+          padding:0 4px;max-width:130px;text-align:center;
+          font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", system-ui, sans-serif;
+          font-weight:800;font-size:11px;color:#000;
+          line-height:1.2;letter-spacing:-0.01em;
+          -webkit-text-stroke:3px #fff;
+          paint-order:stroke fill;
           pointer-events:none;
           white-space:nowrap;
         `;
