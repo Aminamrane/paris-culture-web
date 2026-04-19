@@ -12,12 +12,14 @@
 const BASE_URL = "https://api.openagenda.com/v2";
 const API_KEY = process.env.OPENAGENDA_API_KEY;
 
-// Key Paris cultural agendas on OpenAgenda
-// You can find more at: https://openagenda.com/search?search=paris+culture
+// Active OpenAgenda agendas containing Paris events — filtered by city
+// Free-tier API doesn't allow cross-agenda search, so we aggregate known active ones
 const PARIS_AGENDAS = [
-  "paris-musees",        // Paris Musées
-  "paris-bibliotheques", // Bibliothèques de Paris
-  "centrepompidou",      // Centre Pompidou
+  "lclo-2026",                    // La Classe L'Œuvre 2026 (Nuit des Musées)
+  "jep-2025-ile-de-france",       // Journées européennes du patrimoine
+  "nuit-europeenne-des-musees-2025",
+  "nuit-blanche",
+  "printemps-des-poetes-2026",
 ];
 
 export interface OpenAgendaEvent {
@@ -86,10 +88,10 @@ export async function fetchParisOpenAgendaEvents(limit = 50): Promise<OpenAgenda
 
   const now = new Date().toISOString();
 
-  // Fetch from all Paris agendas in parallel
+  // Fetch from all agendas in parallel — fetch more than needed, filter by city after
   const results = await Promise.allSettled(
     PARIS_AGENDAS.map((slug) =>
-      fetchAgendaEvents(slug, { limit: Math.ceil(limit / PARIS_AGENDAS.length), from: now })
+      fetchAgendaEvents(slug, { limit: 100, from: now })
     )
   );
 
@@ -98,14 +100,21 @@ export async function fetchParisOpenAgendaEvents(limit = 50): Promise<OpenAgenda
     if (result.status === "fulfilled") all.push(...result.value);
   }
 
+  // Filter to Paris-only events (these agendas span all of France)
+  const parisOnly = all.filter((e) => {
+    const city = (e.location?.city || "").toLowerCase();
+    if (!city) return false;
+    return city === "paris" || city.startsWith("paris ") || /^paris\s*\d/.test(city);
+  });
+
   // Sort by start date
-  all.sort((a, b) => {
+  parisOnly.sort((a, b) => {
     const dateA = a.firstTiming?.begin || "";
     const dateB = b.firstTiming?.begin || "";
     return dateA.localeCompare(dateB);
   });
 
-  return all.slice(0, limit);
+  return parisOnly.slice(0, limit);
 }
 
 import type { ParisEvent } from "./paris-opendata";
