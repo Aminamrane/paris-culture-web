@@ -152,22 +152,7 @@ export default function MapView({ initialEvents }: Props) {
       }
       setStatus("");
 
-      // Inject animation styles once
-      if (!document.getElementById("marker-animations")) {
-        const style = document.createElement("style");
-        style.id = "marker-animations";
-        style.textContent = `
-          @keyframes markerPop {
-            0% { transform: scale(0); opacity: 0; }
-            60% { transform: scale(1.12); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-          }
-          .marker-inner { animation: markerPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-        `;
-        document.head.appendChild(style);
-      }
-
-      // ── Popularity scoring (determines which events show when zoomed out) ──
+      // ── Popularity scoring ──
       const WELL_KNOWN_VENUES = [
         "louvre", "pompidou", "orsay", "philharmonie", "opéra", "opera",
         "palais de tokyo", "grand palais", "petit palais", "monnaie",
@@ -193,15 +178,14 @@ export default function MapView({ initialEvents }: Props) {
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
       }
 
-      // ── Create a single marker DOM (reused for all events) ──
+      // ── Dual-state marker: full view (squircle+title) OR tiny dot ──
       interface MarkerRecord {
         event: ParisEvent;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         marker: any;
         score: number;
-        titleEl: HTMLElement;
-        clusterEl: HTMLElement;
-        dotsEl: HTMLElement;
+        fullView: HTMLElement;
+        dotView: HTMLElement;
       }
 
       function buildMarkerDom(event: ParisEvent) {
@@ -209,14 +193,21 @@ export default function MapView({ initialEvents }: Props) {
         const fixed = isFixedVenue(event);
         const today = isSameDay(event.date_start);
 
+        // Wrapper is a zero-size anchor point (so both views align at same geo coord)
         const wrapper = document.createElement("div");
-        wrapper.style.cssText = "display:flex;flex-direction:column;align-items:center;cursor:pointer;";
+        wrapper.style.cssText = `position:relative;width:0;height:0;cursor:pointer;`;
 
-        const inner = document.createElement("div");
-        inner.className = "marker-inner";
-        inner.style.cssText = "display:flex;flex-direction:column;align-items:center;position:relative;";
+        // ── FULL VIEW (squircle + italic title) — starts hidden, grows in ──
+        const fullView = document.createElement("div");
+        fullView.style.cssText = `
+          position:absolute;bottom:0;left:50%;
+          transform:translateX(-50%) scale(0);opacity:0;
+          transform-origin:center bottom;
+          transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.28s ease-out;
+          display:flex;flex-direction:column;align-items:center;
+          pointer-events:none;
+        `;
 
-        // Squircle tile
         const imgBox = document.createElement("div");
         imgBox.style.cssText = `
           position:relative;width:66px;height:66px;border-radius:18px;overflow:hidden;
@@ -237,129 +228,142 @@ export default function MapView({ initialEvents }: Props) {
           imgBox.appendChild(icon);
         }
 
-        // Date dot — top-right corner
-        const dot = document.createElement("div");
-        dot.style.cssText = `
+        // Top-right date indicator (green if today, gray if later)
+        const dateIndicator = document.createElement("div");
+        dateIndicator.style.cssText = `
           position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;
           background:${today ? "#22c55e" : "#9ca3af"};
           border:2.5px solid #fff;
           box-shadow:0 1px 3px rgba(0,0,0,0.25);
         `;
-        imgBox.appendChild(dot);
+        imgBox.appendChild(dateIndicator);
 
-        inner.appendChild(imgBox);
+        fullView.appendChild(imgBox);
 
-        // Title + cluster count
-        const lbl = document.createElement("div");
-        lbl.style.cssText = `
-          margin-top:6px;padding:0 4px;max-width:120px;text-align:center;
-          pointer-events:none;display:flex;flex-direction:column;gap:1px;align-items:center;
-        `;
+        // Title
         const titleEl = document.createElement("span");
         const t = event.title || event.address_name || "";
         titleEl.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
         titleEl.style.cssText = `
+          margin-top:6px;padding:0 4px;max-width:120px;text-align:center;
           font-family:Georgia, 'Times New Roman', serif;
           font-style:italic;font-weight:700;
-          font-size:11px;color:#1f2937;
-          line-height:1.2;display:block;
+          font-size:11px;color:#1f2937;line-height:1.2;
           text-shadow:0 1px 2px rgba(255,255,255,0.95), 0 0 4px rgba(255,255,255,0.9);
+          pointer-events:none;
         `;
-        lbl.appendChild(titleEl);
+        fullView.appendChild(titleEl);
 
-        // Cluster count (hidden by default)
-        const clusterEl = document.createElement("span");
-        clusterEl.style.cssText = `
-          font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-          font-size:10px;font-weight:700;color:#6b7280;
-          text-shadow:0 1px 2px rgba(255,255,255,0.95);
-          display:none;
+        wrapper.appendChild(fullView);
+
+        // ── DOT VIEW (tiny circle at exact geo position) ──
+        const dotView = document.createElement("div");
+        dotView.style.cssText = `
+          position:absolute;bottom:-5px;left:-5px;
+          width:10px;height:10px;border-radius:50%;
+          background:${today ? "#22c55e" : "#fff"};
+          box-shadow:0 1px 4px rgba(0,0,0,0.4), 0 0 0 1.5px rgba(0,0,0,0.12);
+          transform:scale(0);opacity:0;
+          transform-origin:center;
+          transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.28s ease-out;
+          pointer-events:auto;
         `;
-        lbl.appendChild(clusterEl);
+        wrapper.appendChild(dotView);
 
-        // White dots row (hint there are more events nearby)
-        const dotsEl = document.createElement("div");
-        dotsEl.style.cssText = `
-          display:none;gap:3px;margin-top:2px;
-        `;
-        lbl.appendChild(dotsEl);
-
-        inner.appendChild(lbl);
-        wrapper.appendChild(inner);
-
-        return { wrapper, titleEl, clusterEl, dotsEl };
+        return { wrapper, fullView, dotView };
       }
 
       const geoEvents = filtered.filter((e) => e.lat_lon);
       const markerRecords: MarkerRecord[] = [];
 
       geoEvents.forEach((event) => {
-        const { wrapper, titleEl, clusterEl, dotsEl } = buildMarkerDom(event);
+        const { wrapper, fullView, dotView } = buildMarkerDom(event);
         wrapper.onclick = (e) => {
           e.stopPropagation();
           setSelectedEvent(event);
           map.flyTo({ center: [event.lat_lon!.lon, event.lat_lon!.lat], zoom: Math.max(map.getZoom(), 15), duration: 600 });
         };
-        const marker = new mapboxgl.Marker({ element: wrapper, anchor: "bottom" })
+        const marker = new mapboxgl.Marker({ element: wrapper, anchor: "center" })
           .setLngLat([event.lat_lon!.lon, event.lat_lon!.lat])
           .addTo(map);
-        markerRecords.push({ event, marker, score: popScore(event), titleEl, clusterEl, dotsEl });
+        markerRecords.push({ event, marker, score: popScore(event), fullView, dotView });
       });
 
-      // Sort by popularity (desc) — higher score gets priority to show
+      // Sort by popularity desc — highest score gets priority for full view
       markerRecords.sort((a, b) => b.score - a.score);
 
-      // ── Overlap-aware visibility update — runs on every zoom/move ──
-      function updateVisibility() {
-        const zoom = map.getZoom();
-        const threshold = zoom < 11 ? 110 : zoom < 13 ? 85 : 70;
-        const maxVisible = zoom < 10 ? 8 : zoom < 11 ? 15 : zoom < 12 ? 30 : 9999;
-
-        const placed: { rec: MarkerRecord; x: number; y: number; absorbed: number }[] = [];
-
-        for (const rec of markerRecords) {
-          const el = rec.marker.getElement() as HTMLElement;
-          if (!rec.event.lat_lon) { el.style.display = "none"; continue; }
-          const p = map.project([rec.event.lat_lon.lon, rec.event.lat_lon.lat]);
-
-          let absorbedBy: typeof placed[0] | null = null;
-          for (const pl of placed) {
-            const dx = p.x - pl.x, dy = p.y - pl.y;
-            if (Math.sqrt(dx * dx + dy * dy) < threshold) { absorbedBy = pl; break; }
-          }
-
-          if (absorbedBy || placed.length >= maxVisible) {
-            el.style.display = "none";
-            if (absorbedBy) absorbedBy.absorbed++;
-          } else {
-            el.style.display = "";
-            placed.push({ rec, x: p.x, y: p.y, absorbed: 0 });
-          }
+      type Mode = "full" | "dot" | "hidden";
+      function setMode(rec: MarkerRecord, mode: Mode) {
+        const { fullView, dotView } = rec;
+        if (mode === "full") {
+          fullView.style.transform = "translateX(-50%) scale(1)";
+          fullView.style.opacity = "1";
+          fullView.style.pointerEvents = "auto";
+          dotView.style.transform = "scale(0)";
+          dotView.style.opacity = "0";
+          dotView.style.pointerEvents = "none";
+        } else if (mode === "dot") {
+          fullView.style.transform = "translateX(-50%) scale(0)";
+          fullView.style.opacity = "0";
+          fullView.style.pointerEvents = "none";
+          dotView.style.transform = "scale(1)";
+          dotView.style.opacity = "1";
+          dotView.style.pointerEvents = "auto";
+        } else {
+          fullView.style.transform = "translateX(-50%) scale(0)";
+          fullView.style.opacity = "0";
+          dotView.style.transform = "scale(0)";
+          dotView.style.opacity = "0";
         }
-
-        // Update cluster indicators on visible markers
-        placed.forEach((pl) => {
-          const { clusterEl, dotsEl } = pl.rec;
-          if (pl.absorbed > 0) {
-            clusterEl.textContent = `+${pl.absorbed} more`;
-            clusterEl.style.display = "block";
-            // Render small white dots (max 5)
-            dotsEl.innerHTML = "";
-            const dotCount = Math.min(pl.absorbed, 5);
-            for (let i = 0; i < dotCount; i++) {
-              const d = document.createElement("span");
-              d.style.cssText = "width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3),0 0 0 1px rgba(0,0,0,0.08);display:inline-block;";
-              dotsEl.appendChild(d);
-            }
-            dotsEl.style.display = "flex";
-          } else {
-            clusterEl.style.display = "none";
-            dotsEl.style.display = "none";
-          }
-        });
       }
 
-      updateVisibility();
+      // ── Decide mode for each marker based on zoom + overlap ──
+      function updateVisibility() {
+        const zoom = map.getZoom();
+        // How many full markers can show at each zoom (generous)
+        const maxFull = zoom < 10 ? 12 : zoom < 11 ? 25 : zoom < 12 ? 55 : zoom < 13 ? 120 : 9999;
+        // Pixel threshold for full-marker overlap (full markers hide each other)
+        const fullThreshold = zoom < 11 ? 100 : zoom < 13 ? 80 : 65;
+        // Pixel threshold for dot overlap (much smaller — dots are tiny)
+        const dotThreshold = 18;
+
+        const placedFull: { x: number; y: number }[] = [];
+        const placedDots: { x: number; y: number }[] = [];
+
+        for (const rec of markerRecords) {
+          if (!rec.event.lat_lon) { setMode(rec, "hidden"); continue; }
+          const p = map.project([rec.event.lat_lon.lon, rec.event.lat_lon.lat]);
+
+          let canBeFull = placedFull.length < maxFull;
+          if (canBeFull) {
+            for (const pf of placedFull) {
+              const dx = p.x - pf.x, dy = p.y - pf.y;
+              if (Math.sqrt(dx * dx + dy * dy) < fullThreshold) { canBeFull = false; break; }
+            }
+          }
+
+          if (canBeFull) {
+            setMode(rec, "full");
+            placedFull.push({ x: p.x, y: p.y });
+          } else {
+            // Check dot overlap — skip if too close to existing dot/full
+            let dotOverlaps = false;
+            for (const pd of placedDots) {
+              const dx = p.x - pd.x, dy = p.y - pd.y;
+              if (Math.sqrt(dx * dx + dy * dy) < dotThreshold) { dotOverlaps = true; break; }
+            }
+            if (dotOverlaps) {
+              setMode(rec, "hidden");
+            } else {
+              setMode(rec, "dot");
+              placedDots.push({ x: p.x, y: p.y });
+            }
+          }
+        }
+      }
+
+      // Initial render — trigger pop-in animation from scale 0
+      requestAnimationFrame(updateVisibility);
       map.on("zoomend", updateVisibility);
       map.on("moveend", updateVisibility);
 
