@@ -178,10 +178,9 @@ export default function MapView({ initialEvents }: Props) {
       function addMarker(event: ParisEvent, delay: number) {
         setTimeout(() => {
         if (!event.lat_lon) return;
-        const category = categorizeEvent(event.tags, event.qfap_tags);
-        const color = CATEGORY_COLORS[category] || "#6B7280";
         const cover = getEventCover(event);
         const fixed = isFixedVenue(event);
+        if (fixed) fixedCount++; else ephemeralCount++;
 
         const wrapper = document.createElement("div");
         wrapper.style.cssText = "display:flex;flex-direction:column;align-items:center;cursor:pointer;";
@@ -190,64 +189,56 @@ export default function MapView({ initialEvents }: Props) {
         inner.className = "marker-inner";
         inner.style.cssText = "display:flex;flex-direction:column;align-items:center;";
 
+        // Squircle image tile — rounded corners, clean gray outline, soft shadow
         const imgBox = document.createElement("div");
-
-        if (fixed) {
-          // FIXED VENUE — larger square marker with thick border, building icon style
-          if (cover) {
-            imgBox.style.cssText = `width:52px;height:52px;border-radius:14px;overflow:hidden;border:3.5px solid ${color};background:#fff;box-shadow:0 3px 12px rgba(0,0,0,0.3);`;
-            const img = document.createElement("img");
-            img.src = cover;
-            img.loading = "lazy";
-            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-            imgBox.appendChild(img);
-          } else {
-            imgBox.style.cssText = `width:36px;height:36px;border-radius:10px;background:${color};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;`;
-            const icon = document.createElement("span");
-            icon.textContent = "🏛";
-            icon.style.cssText = "font-size:16px;";
-            imgBox.appendChild(icon);
-          }
-          fixedCount++;
+        imgBox.style.cssText = `
+          width:66px;height:66px;border-radius:18px;overflow:hidden;
+          background:#fff;border:1.5px solid #9ca3af;
+          box-shadow:0 4px 14px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
+        `;
+        if (cover) {
+          const img = document.createElement("img");
+          img.src = cover;
+          img.loading = "lazy";
+          img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
+          imgBox.appendChild(img);
         } else {
-          // EPHEMERAL EVENT — smaller round dot or small image
-          if (cover) {
-            imgBox.style.cssText = `width:38px;height:38px;border-radius:50%;overflow:hidden;border:2.5px solid ${color};background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);`;
-            const img = document.createElement("img");
-            img.src = cover;
-            img.loading = "lazy";
-            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-            imgBox.appendChild(img);
-          } else {
-            imgBox.style.cssText = `width:14px;height:14px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,0.25);`;
-          }
-          ephemeralCount++;
+          imgBox.style.cssText += "display:flex;align-items:center;justify-content:center;background:#f3f4f6;";
+          const icon = document.createElement("span");
+          icon.textContent = fixed ? "🏛" : "🎭";
+          icon.style.cssText = "font-size:28px;opacity:0.6;";
+          imgBox.appendChild(icon);
         }
 
         inner.appendChild(imgBox);
 
-        // Label — only for fixed venues (always) or ephemeral with cover
-        if (fixed || cover) {
-          const arrow = document.createElement("div");
-          arrow.style.cssText = `width:${fixed ? 10 : 7}px;height:${fixed ? 10 : 7}px;background:${color};transform:rotate(45deg);margin-top:-${fixed ? 6 : 4}px;`;
-          inner.appendChild(arrow);
-          const lbl = document.createElement("div");
-          lbl.style.cssText = `margin-top:-2px;background:#fff;border-radius:6px;padding:${fixed ? "2px 6px" : "1px 5px"};box-shadow:0 1px 3px rgba(0,0,0,0.12);max-width:${fixed ? 120 : 100}px;text-align:center;`;
-          const txt = document.createElement("span");
-          const t = event.address_name || event.title;
-          txt.textContent = t.length > 20 ? t.slice(0, 18) + "…" : t;
-          txt.style.cssText = `font-size:${fixed ? 10 : 9}px;font-weight:${fixed ? 700 : 600};color:#1f2937;line-height:1.3;display:block;white-space:nowrap;`;
-          lbl.appendChild(txt);
+        // Small dark pin pointing down from the tile
+        const pin = document.createElement("div");
+        pin.style.cssText = `
+          width:8px;height:8px;background:#374151;
+          transform:rotate(45deg);margin-top:-4px;
+          border-radius:1px;
+        `;
+        inner.appendChild(pin);
 
-          if (fixed) {
-            const sub = document.createElement("span");
-            sub.textContent = "Lieu permanent";
-            sub.style.cssText = "font-size:7px;color:#9ca3af;display:block;";
-            lbl.appendChild(sub);
-          }
-
-          inner.appendChild(lbl);
-        }
+        // Italic serif title below the pin
+        const lbl = document.createElement("div");
+        lbl.style.cssText = `
+          margin-top:2px;padding:0 4px;max-width:120px;text-align:center;
+          pointer-events:none;
+        `;
+        const txt = document.createElement("span");
+        const t = event.title || event.address_name || "";
+        txt.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
+        txt.style.cssText = `
+          font-family:Georgia, 'Times New Roman', serif;
+          font-style:italic;font-weight:700;
+          font-size:11px;color:#1f2937;
+          line-height:1.2;display:block;
+          text-shadow:0 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.8);
+        `;
+        lbl.appendChild(txt);
+        inner.appendChild(lbl);
 
         wrapper.appendChild(inner);
 
