@@ -438,15 +438,16 @@ export default function EventDetailPage() {
             </Section>
           )}
 
-          {/* Notes (public comments) */}
+          {/* Notes (public comments) — grouped in a single rounded outlined card */}
           <Section title="Notes" right={
             session?.user?.id ? (
               <button
                 onClick={() => setShowVisitedPopup(true)}
-                style={{ color: BLUE, fontSize: 14, fontWeight: 700, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+                style={{ color: BLUE, fontSize: 14, fontWeight: 700, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
                 Partager une note
               </button>
@@ -455,19 +456,31 @@ export default function EventDetailPage() {
             {notes.length === 0 ? (
               <p style={{ fontSize: 13, color: "#9ca3af" }}>Soyez le premier à partager votre avis après votre visite.</p>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {notes.map((n) => (
-                  <div key={n.id} style={{ display: "flex", gap: 10 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#e5e7eb", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div style={{ border: "1px solid #e5e7eb", borderRadius: 18, overflow: "hidden", background: "#fff" }}>
+                {notes.map((n, i) => (
+                  <div
+                    key={n.id}
+                    style={{
+                      display: "flex", gap: 12,
+                      padding: "14px 14px",
+                      borderTop: i === 0 ? "none" : "1px solid #f3f4f6",
+                    }}
+                  >
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10,
+                      background: ["#fde68a", "#bae6fd", "#fbcfe8", "#bbf7d0", "#ddd6fe"][i % 5],
+                      flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                      overflow: "hidden",
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                       </svg>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: "#111", marginBottom: 2 }}>
+                      <p style={{ fontSize: 14, fontWeight: 800, color: "#111", marginBottom: 4, letterSpacing: "-0.01em" }}>
                         @{(n.user_name || "utilisateur").toLowerCase().replace(/[^a-z0-9]/g, "")}
                       </p>
-                      <p style={{ fontSize: 13.5, color: "#374151", lineHeight: 1.45 }}>{n.note}</p>
+                      <p style={{ fontSize: 14, color: "#111", lineHeight: 1.4 }}>{n.note}</p>
                     </div>
                   </div>
                 ))}
@@ -489,26 +502,30 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {/* Fixed bottom bar — Save / Visited */}
+      {/* Fixed bottom bar — frosted glass Save / Visited buttons */}
       <div
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 60,
           padding: "12px 12px calc(12px + var(--safe-bottom))",
-          background: "linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.9) 30%, rgba(255,255,255,1) 70%)",
           display: "flex", gap: 10,
+          pointerEvents: "none",
         }}
       >
         <button
           onClick={toggleSave}
           style={{
-            flex: 1, height: 52, borderRadius: 999,
-            background: saved ? BLUE : "#fff",
+            pointerEvents: "auto",
+            flex: 1, height: 54, borderRadius: 999,
+            background: saved ? "rgba(37,99,235,0.85)" : "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(22px) saturate(180%)",
+            WebkitBackdropFilter: "blur(22px) saturate(180%)",
             color: saved ? "#fff" : BLUE,
-            border: `1.5px solid ${BLUE}`,
+            border: `1px solid ${saved ? "rgba(37,99,235,0.6)" : "rgba(37,99,235,0.25)"}`,
+            boxShadow: "0 4px 18px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.5) inset",
             fontSize: 15, fontWeight: 800,
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-            transition: "transform 0.1s",
+            cursor: "pointer",
+            transition: "transform 0.1s, background 0.2s",
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -519,13 +536,18 @@ export default function EventDetailPage() {
         <button
           onClick={() => setShowVisitedPopup(true)}
           style={{
-            flex: 1, height: 52, borderRadius: 999,
-            background: visited ? BLUE : "#fff",
+            pointerEvents: "auto",
+            flex: 1, height: 54, borderRadius: 999,
+            background: visited ? "rgba(37,99,235,0.85)" : "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(22px) saturate(180%)",
+            WebkitBackdropFilter: "blur(22px) saturate(180%)",
             color: visited ? "#fff" : BLUE,
-            border: `1.5px solid ${BLUE}`,
+            border: `1px solid ${visited ? "rgba(37,99,235,0.6)" : "rgba(37,99,235,0.25)"}`,
+            boxShadow: "0 4px 18px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.5) inset",
             fontSize: 15, fontWeight: 800,
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+            cursor: "pointer",
+            transition: "transform 0.1s, background 0.2s",
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
