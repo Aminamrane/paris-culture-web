@@ -210,10 +210,16 @@ export default function MapView({ initialEvents }: Props) {
           pointer-events:none;
         `;
 
-        // Squircle — centered on wrapper origin (geo)
+        // Squircle wrapper — doesn't clip, so date indicator can overflow outside
+        const squircleBox = document.createElement("div");
+        squircleBox.style.cssText = `
+          position:absolute;left:-33px;top:-33px;width:66px;height:66px;
+        `;
+
+        // Inner image box — this one clips the image to rounded corners
         const imgBox = document.createElement("div");
         imgBox.style.cssText = `
-          position:absolute;left:-33px;top:-33px;width:66px;height:66px;
+          position:absolute;inset:0;
           border-radius:18px;overflow:hidden;
           background:#fff;border:1.5px solid #9ca3af;
           box-shadow:0 4px 14px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
@@ -232,18 +238,21 @@ export default function MapView({ initialEvents }: Props) {
           icon.style.cssText = "font-size:28px;opacity:0.6;";
           imgBox.appendChild(icon);
         }
+        squircleBox.appendChild(imgBox);
 
-        // Top-right date indicator on squircle
+        // Date indicator — sibling of imgBox, NOT clipped. Sticks out from top-right.
         const dateIndicator = document.createElement("div");
         dateIndicator.style.cssText = `
-          position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;
+          position:absolute;top:-7px;right:-7px;
+          width:16px;height:16px;border-radius:50%;
           background:${today ? "#22c55e" : "#9ca3af"};
           border:2.5px solid #fff;
-          box-shadow:0 1px 3px rgba(0,0,0,0.25);
+          box-shadow:0 2px 5px rgba(0,0,0,0.3);
+          pointer-events:none;
         `;
-        imgBox.appendChild(dateIndicator);
+        squircleBox.appendChild(dateIndicator);
 
-        fullView.appendChild(imgBox);
+        fullView.appendChild(squircleBox);
 
         // Title — below squircle (at y=39, which is 33 + 6 gap)
         const titleEl = document.createElement("span");
@@ -309,7 +318,9 @@ export default function MapView({ initialEvents }: Props) {
 
       function setMode(rec: MarkerRecord, mode: Mode) {
         const { fullView, dotView } = rec;
+        const markerEl = rec.marker.getElement() as HTMLElement;
         if (mode === "full") {
+          markerEl.style.zIndex = "10"; // full markers above dots
           fullView.style.transition = POP_IN;
           fullView.style.transform = "scale(1)";
           fullView.style.opacity = "1";
@@ -319,6 +330,7 @@ export default function MapView({ initialEvents }: Props) {
           dotView.style.opacity = "0";
           dotView.style.pointerEvents = "none";
         } else if (mode === "dot") {
+          markerEl.style.zIndex = "1"; // dots in the background
           fullView.style.transition = POP_OUT;
           fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
@@ -328,6 +340,7 @@ export default function MapView({ initialEvents }: Props) {
           dotView.style.opacity = "1";
           dotView.style.pointerEvents = "auto";
         } else {
+          markerEl.style.zIndex = "0";
           fullView.style.transition = POP_OUT;
           fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
