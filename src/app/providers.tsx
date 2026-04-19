@@ -68,6 +68,25 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   );
 }
 
+function GeolocationBootstrap() {
+  useEffect(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+    const cached = sessionStorage.getItem("lumina_user_location");
+    if (cached) return; // already have one for this session
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        sessionStorage.setItem(
+          "lumina_user_location",
+          JSON.stringify({ lat: p.coords.latitude, lon: p.coords.longitude })
+        );
+      },
+      () => {}, // user refused — silent
+      { timeout: 8000, maximumAge: 600000 }
+    );
+  }, []);
+  return null;
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [showSplash, setShowSplash] = useState(false);
 
@@ -83,6 +102,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
+      <GeolocationBootstrap />
       {showSplash && <SplashScreen onDone={handleSplashDone} />}
       {children}
     </SessionProvider>
