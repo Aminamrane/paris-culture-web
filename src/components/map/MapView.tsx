@@ -302,25 +302,36 @@ export default function MapView({ initialEvents }: Props) {
       markerRecords.sort((a, b) => b.score - a.score);
 
       type Mode = "full" | "dot" | "hidden";
+      // Pop-IN: gentle spring, moderate speed
+      const POP_IN = "transform 0.55s cubic-bezier(0.25, 0.8, 0.3, 1.05), opacity 0.35s ease-out";
+      // Pop-OUT: slow, smooth deceleration — no overshoot
+      const POP_OUT = "transform 0.7s cubic-bezier(0.33, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)";
+
       function setMode(rec: MarkerRecord, mode: Mode) {
         const { fullView, dotView } = rec;
         if (mode === "full") {
+          fullView.style.transition = POP_IN;
           fullView.style.transform = "scale(1)";
           fullView.style.opacity = "1";
           fullView.style.pointerEvents = "auto";
+          dotView.style.transition = POP_OUT;
           dotView.style.transform = "scale(0)";
           dotView.style.opacity = "0";
           dotView.style.pointerEvents = "none";
         } else if (mode === "dot") {
+          fullView.style.transition = POP_OUT;
           fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
           fullView.style.pointerEvents = "none";
+          dotView.style.transition = POP_IN;
           dotView.style.transform = "scale(1)";
           dotView.style.opacity = "1";
           dotView.style.pointerEvents = "auto";
         } else {
+          fullView.style.transition = POP_OUT;
           fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
+          dotView.style.transition = POP_OUT;
           dotView.style.transform = "scale(0)";
           dotView.style.opacity = "0";
         }
