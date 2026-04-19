@@ -199,8 +199,14 @@ export default function EventDetailPage() {
     return (
       <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6">
         <p className="text-gray-400 mb-4">Événement non trouvé</p>
-        <button onClick={() => router.back()} className="text-[#2563EB] text-sm font-medium">
-          ← Retour
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) router.back();
+            else router.push("/");
+          }}
+          className="text-[#2563EB] text-sm font-medium"
+        >
+          ← Retour à la carte
         </button>
       </div>
     );
@@ -212,21 +218,32 @@ export default function EventDetailPage() {
   const days = event.date_start ? daysUntil(event.date_start) : null;
   const progress = Math.min(pullY / 100, 1);
 
+  // Robust close: go back in history if possible, otherwise land on the map
+  const closeEvent = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <>
       {/* Fixed top bar */}
       <button
-        onClick={() => router.back()}
-        className="fixed z-[100] w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform"
-        style={{ top: "calc(12px + var(--safe-top))", left: 16 }}
+        type="button"
+        onClick={closeEvent}
+        className="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        style={{ position: "fixed", zIndex: 200, top: "calc(12px + var(--safe-top))", left: 16, pointerEvents: "auto" }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
       <button
-        className="fixed z-[100] w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform"
-        style={{ top: "calc(12px + var(--safe-top))", right: 16 }}
+        type="button"
+        className="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        style={{ position: "fixed", zIndex: 200, top: "calc(12px + var(--safe-top))", right: 16, pointerEvents: "auto" }}
         onClick={() => {
           if (navigator.share) navigator.share({ title: event.title, url: window.location.href });
         }}
