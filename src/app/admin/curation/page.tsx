@@ -203,15 +203,22 @@ export default function CurationPage() {
         setDecisions(existingDecisions);
       } catch {}
 
-      // Fetch events from OpenData, skip already-decided ones
+      // Fetch events from Paris OpenData + OpenAgenda in parallel, dedup, skip already-decided
       const seen = new Set(existingDecisions.map(r => r.externalId));
       const now = new Date().toISOString().split("T")[0];
-      const url = `https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=${encodeURIComponent(`date_end>="${now}" AND lat_lon IS NOT NULL`)}&order_by=${encodeURIComponent("date_start ASC")}`;
+      const qfapUrl = `https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=${encodeURIComponent(`date_end>="${now}" AND lat_lon IS NOT NULL`)}&order_by=${encodeURIComponent("date_start ASC")}`;
       try {
-        const data = await fetch(url).then(r => r.json());
-        const events: ParisEvent[] = data.results || [];
-        setAll(events);
-        const pending = events.filter(e => !seen.has(e.id));
+        const [qfapData, oaData] = await Promise.all([
+          fetch(qfapUrl).then(r => r.json()).catch(() => ({ results: [] })),
+          fetch("/api/events/openagenda").then(r => r.json()).catch(() => ({ events: [] })),
+        ]);
+        const qfapEvents: ParisEvent[] = qfapData.results || [];
+        const oaEvents: ParisEvent[] = oaData.events || [];
+        // Merge with dedup — Que Faire à Paris takes priority on conflict
+        const { mergeDedupEvents } = await import("@/lib/openagenda");
+        const merged = mergeDedupEvents(qfapEvents, oaEvents);
+        setAll(merged);
+        const pending = merged.filter(e => !seen.has(e.id));
         setQueue(pending);
         if (pending.length === 0) setDone(true);
       } catch {}

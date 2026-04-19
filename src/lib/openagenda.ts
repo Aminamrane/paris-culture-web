@@ -108,7 +108,9 @@ export async function fetchParisOpenAgendaEvents(limit = 50): Promise<OpenAgenda
   return all.slice(0, limit);
 }
 
-export function openAgendaEventToParisEvent(e: OpenAgendaEvent) {
+import type { ParisEvent } from "./paris-opendata";
+
+export function openAgendaEventToParisEvent(e: OpenAgendaEvent): ParisEvent {
   const coverUrl = e.image?.base && e.image?.filename
     ? `${e.image.base}${e.image.filename}`
     : null;
@@ -118,10 +120,11 @@ export function openAgendaEventToParisEvent(e: OpenAgendaEvent) {
     title: e.title?.fr || e.title?.en || "Sans titre",
     lead_text: e.description?.fr?.slice(0, 200) || null,
     description: e.description?.fr || null,
-    cover_url: coverUrl,
-    image_couverture: null,
     date_start: e.firstTiming?.begin || null,
     date_end: e.lastTiming?.end || null,
+    date_description: e.dateRange || null,
+    cover_url: coverUrl,
+    cover_alt: null,
     address_name: e.location?.name || null,
     address_street: e.location?.address || null,
     address_zipcode: e.location?.postalCode || null,
@@ -131,22 +134,50 @@ export function openAgendaEventToParisEvent(e: OpenAgendaEvent) {
       : null,
     price_type: e.conditions?.fr ? "payant" : "gratuit",
     price_detail: e.conditions?.fr || null,
+    access_type: null,
     access_link: e.registration?.[0]?.value || null,
+    transport: null,
+    pmr: null,
+    blind: null,
+    deaf: null,
     contact_url: null,
     contact_phone: null,
     contact_mail: null,
     contact_facebook: null,
     contact_instagram: null,
     tags: e.keywords?.fr?.join(",") || null,
-    qfap_tags: null,
-    universe_tags: null,
-    group: null,
-    audience: null,
+    qfap_tags: e.keywords?.fr?.join(",") || null,
     url: `https://openagenda.com/agendas/${e.agendaSlug}/events/${e.slug}`,
+    image_couverture: null,
     programs: null,
-    transport: null,
-    pmr: null,
-    blind: null,
-    deaf: null,
   };
+}
+
+// Normalize title for deduplication (lowercase, no accents, no punctuation)
+function normalizeTitle(t: string): string {
+  return t
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dedupKey(event: ParisEvent): string {
+  const title = normalizeTitle(event.title);
+  const day = event.date_start ? event.date_start.slice(0, 10) : "";
+  return `${title}||${day}`;
+}
+
+// Merge lists keeping primary's entries on conflict
+export function mergeDedupEvents(primary: ParisEvent[], secondary: ParisEvent[]): ParisEvent[] {
+  const seen = new Set(primary.map(dedupKey));
+  const extras = secondary.filter((e) => {
+    const key = dedupKey(e);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return [...primary, ...extras];
 }
