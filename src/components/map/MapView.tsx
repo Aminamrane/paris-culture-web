@@ -193,26 +193,31 @@ export default function MapView({ initialEvents }: Props) {
         const fixed = isFixedVenue(event);
         const today = isSameDay(event.date_start);
 
-        // Wrapper is a zero-size anchor point (so both views align at same geo coord)
+        // Wrapper is a zero-size anchor point. All children positioned absolutely
+        // relative to the wrapper origin (which Mapbox places at the geo coord).
         const wrapper = document.createElement("div");
         wrapper.style.cssText = `position:relative;width:0;height:0;cursor:pointer;`;
 
-        // ── FULL VIEW (squircle + italic title) — starts hidden, grows in ──
+        // ── FULL VIEW — scales from wrapper origin (geo coord) ──
+        // Squircle is centered EXACTLY on geo coord; title extends below.
+        // When scale→0, everything collapses into the geo point.
         const fullView = document.createElement("div");
         fullView.style.cssText = `
-          position:absolute;bottom:0;left:50%;
-          transform:translateX(-50%) scale(0);opacity:0;
-          transform-origin:center bottom;
+          position:absolute;left:0;top:0;width:0;height:0;
+          transform:scale(0);opacity:0;
+          transform-origin:0 0;
           transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.28s ease-out;
-          display:flex;flex-direction:column;align-items:center;
           pointer-events:none;
         `;
 
+        // Squircle — centered on wrapper origin (geo)
         const imgBox = document.createElement("div");
         imgBox.style.cssText = `
-          position:relative;width:66px;height:66px;border-radius:18px;overflow:hidden;
+          position:absolute;left:-33px;top:-33px;width:66px;height:66px;
+          border-radius:18px;overflow:hidden;
           background:#fff;border:1.5px solid #9ca3af;
           box-shadow:0 4px 14px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
+          pointer-events:auto;
         `;
         if (cover) {
           const img = document.createElement("img");
@@ -228,7 +233,7 @@ export default function MapView({ initialEvents }: Props) {
           imgBox.appendChild(icon);
         }
 
-        // Top-right date indicator (green if today, gray if later)
+        // Top-right date indicator on squircle
         const dateIndicator = document.createElement("div");
         dateIndicator.style.cssText = `
           position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;
@@ -240,26 +245,30 @@ export default function MapView({ initialEvents }: Props) {
 
         fullView.appendChild(imgBox);
 
-        // Title
+        // Title — below squircle (at y=39, which is 33 + 6 gap)
         const titleEl = document.createElement("span");
         const t = event.title || event.address_name || "";
         titleEl.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
         titleEl.style.cssText = `
-          margin-top:6px;padding:0 4px;max-width:120px;text-align:center;
+          position:absolute;top:39px;left:50%;transform:translateX(-50%);
+          padding:0 4px;max-width:120px;text-align:center;
           font-family:Georgia, 'Times New Roman', serif;
           font-style:italic;font-weight:700;
           font-size:11px;color:#1f2937;line-height:1.2;
           text-shadow:0 1px 2px rgba(255,255,255,0.95), 0 0 4px rgba(255,255,255,0.9);
           pointer-events:none;
+          white-space:nowrap;
         `;
         fullView.appendChild(titleEl);
 
         wrapper.appendChild(fullView);
 
-        // ── DOT VIEW (tiny circle at exact geo position) ──
+        // ── DOT VIEW — centered on wrapper origin (geo coord) ──
+        // Same exact position where the squircle was centered, so the
+        // transition is visually "where the squircle was, a dot appears".
         const dotView = document.createElement("div");
         dotView.style.cssText = `
-          position:absolute;bottom:-5px;left:-5px;
+          position:absolute;top:-5px;left:-5px;
           width:10px;height:10px;border-radius:50%;
           background:${today ? "#22c55e" : "#fff"};
           box-shadow:0 1px 4px rgba(0,0,0,0.4), 0 0 0 1.5px rgba(0,0,0,0.12);
@@ -296,21 +305,21 @@ export default function MapView({ initialEvents }: Props) {
       function setMode(rec: MarkerRecord, mode: Mode) {
         const { fullView, dotView } = rec;
         if (mode === "full") {
-          fullView.style.transform = "translateX(-50%) scale(1)";
+          fullView.style.transform = "scale(1)";
           fullView.style.opacity = "1";
           fullView.style.pointerEvents = "auto";
           dotView.style.transform = "scale(0)";
           dotView.style.opacity = "0";
           dotView.style.pointerEvents = "none";
         } else if (mode === "dot") {
-          fullView.style.transform = "translateX(-50%) scale(0)";
+          fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
           fullView.style.pointerEvents = "none";
           dotView.style.transform = "scale(1)";
           dotView.style.opacity = "1";
           dotView.style.pointerEvents = "auto";
         } else {
-          fullView.style.transform = "translateX(-50%) scale(0)";
+          fullView.style.transform = "scale(0)";
           fullView.style.opacity = "0";
           dotView.style.transform = "scale(0)";
           dotView.style.opacity = "0";
