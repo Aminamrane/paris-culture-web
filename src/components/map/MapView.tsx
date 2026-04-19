@@ -160,39 +160,66 @@ export default function MapView({ initialEvents }: Props) {
           @keyframes markerPop {
             0% { transform: scale(0); opacity: 0; }
             60% { transform: scale(1.12); opacity: 1; }
-            80% { transform: scale(0.95); }
             100% { transform: scale(1); opacity: 1; }
           }
-          .marker-inner {
-            animation: markerPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
-          }
+          .marker-inner { animation: markerPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
         `;
         document.head.appendChild(style);
       }
 
-      // Add markers one by one with staggered setTimeout
-      let count = 0;
-      let fixedCount = 0;
-      let ephemeralCount = 0;
+      // ── Popularity scoring (determines which events show when zoomed out) ──
+      const WELL_KNOWN_VENUES = [
+        "louvre", "pompidou", "orsay", "philharmonie", "opéra", "opera",
+        "palais de tokyo", "grand palais", "petit palais", "monnaie",
+        "fondation", "institut", "musée", "theatre", "théâtre",
+        "conservatoire", "cinémathèque", "bnf", "palais", "comédie",
+        "châtelet", "odéon", "bouffes", "athénée", "centre pompidou",
+      ];
+      function popScore(event: ParisEvent): number {
+        let s = 0;
+        if (isFixedVenue(event)) s += 10;
+        if (getEventCover(event)) s += 8;
+        const name = (event.address_name || "").toLowerCase();
+        if (WELL_KNOWN_VENUES.some((kw) => name.includes(kw))) s += 20;
+        if (event.price_type === "gratuit") s += 2;
+        if (event.lead_text && event.lead_text.length > 100) s += 1;
+        return s;
+      }
 
-      function addMarker(event: ParisEvent, delay: number) {
-        setTimeout(() => {
-        if (!event.lat_lon) return;
+      function isSameDay(dateStr: string | null): boolean {
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        const now = new Date();
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+      }
+
+      // ── Create a single marker DOM (reused for all events) ──
+      interface MarkerRecord {
+        event: ParisEvent;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        marker: any;
+        score: number;
+        titleEl: HTMLElement;
+        clusterEl: HTMLElement;
+        dotsEl: HTMLElement;
+      }
+
+      function buildMarkerDom(event: ParisEvent) {
         const cover = getEventCover(event);
         const fixed = isFixedVenue(event);
-        if (fixed) fixedCount++; else ephemeralCount++;
+        const today = isSameDay(event.date_start);
 
         const wrapper = document.createElement("div");
         wrapper.style.cssText = "display:flex;flex-direction:column;align-items:center;cursor:pointer;";
-        // Inner div for animation — doesn't interfere with Mapbox positioning
+
         const inner = document.createElement("div");
         inner.className = "marker-inner";
-        inner.style.cssText = "display:flex;flex-direction:column;align-items:center;";
+        inner.style.cssText = "display:flex;flex-direction:column;align-items:center;position:relative;";
 
-        // Squircle image tile — rounded corners, clean gray outline, soft shadow
+        // Squircle tile
         const imgBox = document.createElement("div");
         imgBox.style.cssText = `
-          width:66px;height:66px;border-radius:18px;overflow:hidden;
+          position:relative;width:66px;height:66px;border-radius:18px;overflow:hidden;
           background:#fff;border:1.5px solid #9ca3af;
           box-shadow:0 4px 14px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08);
         `;
@@ -210,60 +237,134 @@ export default function MapView({ initialEvents }: Props) {
           imgBox.appendChild(icon);
         }
 
+        // Date dot — top-right corner
+        const dot = document.createElement("div");
+        dot.style.cssText = `
+          position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;
+          background:${today ? "#22c55e" : "#9ca3af"};
+          border:2.5px solid #fff;
+          box-shadow:0 1px 3px rgba(0,0,0,0.25);
+        `;
+        imgBox.appendChild(dot);
+
         inner.appendChild(imgBox);
 
-        // Small dark pin pointing down from the tile
-        const pin = document.createElement("div");
-        pin.style.cssText = `
-          width:8px;height:8px;background:#374151;
-          transform:rotate(45deg);margin-top:-4px;
-          border-radius:1px;
-        `;
-        inner.appendChild(pin);
-
-        // Italic serif title below the pin
+        // Title + cluster count
         const lbl = document.createElement("div");
         lbl.style.cssText = `
-          margin-top:2px;padding:0 4px;max-width:120px;text-align:center;
-          pointer-events:none;
+          margin-top:6px;padding:0 4px;max-width:120px;text-align:center;
+          pointer-events:none;display:flex;flex-direction:column;gap:1px;align-items:center;
         `;
-        const txt = document.createElement("span");
+        const titleEl = document.createElement("span");
         const t = event.title || event.address_name || "";
-        txt.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
-        txt.style.cssText = `
+        titleEl.textContent = t.length > 26 ? t.slice(0, 24) + "…" : t;
+        titleEl.style.cssText = `
           font-family:Georgia, 'Times New Roman', serif;
           font-style:italic;font-weight:700;
           font-size:11px;color:#1f2937;
           line-height:1.2;display:block;
-          text-shadow:0 1px 2px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,0.8);
+          text-shadow:0 1px 2px rgba(255,255,255,0.95), 0 0 4px rgba(255,255,255,0.9);
         `;
-        lbl.appendChild(txt);
-        inner.appendChild(lbl);
+        lbl.appendChild(titleEl);
 
+        // Cluster count (hidden by default)
+        const clusterEl = document.createElement("span");
+        clusterEl.style.cssText = `
+          font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+          font-size:10px;font-weight:700;color:#6b7280;
+          text-shadow:0 1px 2px rgba(255,255,255,0.95);
+          display:none;
+        `;
+        lbl.appendChild(clusterEl);
+
+        // White dots row (hint there are more events nearby)
+        const dotsEl = document.createElement("div");
+        dotsEl.style.cssText = `
+          display:none;gap:3px;margin-top:2px;
+        `;
+        lbl.appendChild(dotsEl);
+
+        inner.appendChild(lbl);
         wrapper.appendChild(inner);
 
+        return { wrapper, titleEl, clusterEl, dotsEl };
+      }
+
+      const geoEvents = filtered.filter((e) => e.lat_lon);
+      const markerRecords: MarkerRecord[] = [];
+
+      geoEvents.forEach((event) => {
+        const { wrapper, titleEl, clusterEl, dotsEl } = buildMarkerDom(event);
         wrapper.onclick = (e) => {
           e.stopPropagation();
           setSelectedEvent(event);
           map.flyTo({ center: [event.lat_lon!.lon, event.lat_lon!.lat], zoom: Math.max(map.getZoom(), 15), duration: 600 });
         };
-
-        new mapboxgl.Marker({ element: wrapper, anchor: "bottom" })
-          .setLngLat([event.lat_lon.lon, event.lat_lon.lat])
+        const marker = new mapboxgl.Marker({ element: wrapper, anchor: "bottom" })
+          .setLngLat([event.lat_lon!.lon, event.lat_lon!.lat])
           .addTo(map);
-        count++;
-        }, delay);
-      }
-
-      // Launch markers one by one
-      const geoEvents = filtered.filter(e => e.lat_lon);
-      geoEvents.forEach((event, i) => {
-        addMarker(event, i * 50); // 50ms between each pop
-        if (isFixedVenue(event)) fixedCount++; else ephemeralCount++;
+        markerRecords.push({ event, marker, score: popScore(event), titleEl, clusterEl, dotsEl });
       });
 
+      // Sort by popularity (desc) — higher score gets priority to show
+      markerRecords.sort((a, b) => b.score - a.score);
+
+      // ── Overlap-aware visibility update — runs on every zoom/move ──
+      function updateVisibility() {
+        const zoom = map.getZoom();
+        const threshold = zoom < 11 ? 110 : zoom < 13 ? 85 : 70;
+        const maxVisible = zoom < 10 ? 8 : zoom < 11 ? 15 : zoom < 12 ? 30 : 9999;
+
+        const placed: { rec: MarkerRecord; x: number; y: number; absorbed: number }[] = [];
+
+        for (const rec of markerRecords) {
+          const el = rec.marker.getElement() as HTMLElement;
+          if (!rec.event.lat_lon) { el.style.display = "none"; continue; }
+          const p = map.project([rec.event.lat_lon.lon, rec.event.lat_lon.lat]);
+
+          let absorbedBy: typeof placed[0] | null = null;
+          for (const pl of placed) {
+            const dx = p.x - pl.x, dy = p.y - pl.y;
+            if (Math.sqrt(dx * dx + dy * dy) < threshold) { absorbedBy = pl; break; }
+          }
+
+          if (absorbedBy || placed.length >= maxVisible) {
+            el.style.display = "none";
+            if (absorbedBy) absorbedBy.absorbed++;
+          } else {
+            el.style.display = "";
+            placed.push({ rec, x: p.x, y: p.y, absorbed: 0 });
+          }
+        }
+
+        // Update cluster indicators on visible markers
+        placed.forEach((pl) => {
+          const { clusterEl, dotsEl } = pl.rec;
+          if (pl.absorbed > 0) {
+            clusterEl.textContent = `+${pl.absorbed} more`;
+            clusterEl.style.display = "block";
+            // Render small white dots (max 5)
+            dotsEl.innerHTML = "";
+            const dotCount = Math.min(pl.absorbed, 5);
+            for (let i = 0; i < dotCount; i++) {
+              const d = document.createElement("span");
+              d.style.cssText = "width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3),0 0 0 1px rgba(0,0,0,0.08);display:inline-block;";
+              dotsEl.appendChild(d);
+            }
+            dotsEl.style.display = "flex";
+          } else {
+            clusterEl.style.display = "none";
+            dotsEl.style.display = "none";
+          }
+        });
+      }
+
+      updateVisibility();
+      map.on("zoomend", updateVisibility);
+      map.on("moveend", updateVisibility);
+
       setStatus("");
-      console.log("Animating", geoEvents.length, "markers —", fixedCount, "fixed,", ephemeralCount, "ephemeral");
+      console.log("Rendered", markerRecords.length, "markers");
     }
 
     init().catch(err => {
